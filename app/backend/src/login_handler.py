@@ -1,4 +1,5 @@
 import csv
+from email import message
 from pathlib import Path
 from tkinter import messagebox
 
@@ -37,6 +38,13 @@ class Login_Logic:
                     return True
             return False
     
+    def register_user(self, username, password):
+        with open(self.csv_path, mode='a', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow([username, password])
+        return True
+
+    
 def handle_sign_in(username_entry, password_entry):
     username = username_entry.get().strip()
     password = password_entry.get()
@@ -47,6 +55,19 @@ def handle_sign_in(username_entry, password_entry):
 
     if isValid:
         messagebox.showinfo("Success", "Login Success")
+    else:
+        messagebox.showerror("Error", "Invalid")
+    
+def handle_sign_up(username_entry, password_entry):
+    username = username_entry.get().strip()
+    password = password_entry.get()
+
+    logic = Login_Logic()
+
+    register = logic.register_user(username, password)
+
+    if register:
+        messagebox.showinfo("Success", "You are now Registered")
     else:
         messagebox.showerror("Error", "Invalid")
 

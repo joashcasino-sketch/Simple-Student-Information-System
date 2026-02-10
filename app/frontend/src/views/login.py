@@ -5,7 +5,7 @@ from tkinter import Label, Tk, Canvas, Entry, Text, Button, PhotoImage
 backend_path = Path(__file__).resolve().parent.parent.parent.parent / "backend" / "src"
 sys.path.insert(0, str(backend_path))
 
-from login_handler import handle_sign_in
+from login_handler import handle_sign_in, handle_sign_up
 
 OUTPUT_PATH = Path(__file__).resolve().parent
 ASSETS_PATH = OUTPUT_PATH.parent.parent.parent / "frontend" / "assets" / "frame0"
@@ -70,6 +70,7 @@ canvas.create_text(
     font=("Inter Light", 13 * -1)
 )
 
+# use for later
 invalid_message = Label(
     window,  # parent widget
     text="*Invalid username or password",
@@ -100,7 +101,7 @@ button_2 = Button(
     image=button_image_2,
     borderwidth=0,
     highlightthickness=0,
-    command=lambda: print("button_2 clicked"),
+    command=lambda: handle_sign_up(username_entry, password_entry),
     relief="flat"
 )
 button_2.place(
