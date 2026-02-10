@@ -1,0 +1,2 @@
+id,username,password_hash,email,created_at
+1,testuser,ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f,test@example.com,2026-02-07 12:05:03
