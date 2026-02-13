@@ -1,25 +1,18 @@
 import csv
 import sys
+import time
 from pathlib import Path
-from tkinter import messagebox
+from tkinter import messagebox, Label
+
 
 
 BASE_DIR = Path(__file__).resolve().parent
 frontend_src_path = BASE_DIR.parent.parent / 'frontend' / 'src'
 sys.path.insert(0, str(frontend_src_path))
 
-from test import Test
+from students_panel import StudentPanel
 
 USER_CSV = BASE_DIR.parent / 'data' / 'users.csv'
-
-with open(USER_CSV, 'r') as csv_file:
-    csv_reader = csv.reader(csv_file)
-
-    next(csv_reader)
-
-    for line in csv_reader:
-        print(line)
-
 class Login_Logic:
 
     def __init__(self, csv_path=USER_CSV):
@@ -52,22 +45,46 @@ class Login_Logic:
 def handle_sign_in(username_entry, password_entry, login_window):
     username = username_entry.get().strip()
     password = password_entry.get()
-
     logic = Login_Logic()
 
+    def show_success(message):
+        success_label = Label(
+            login_window,
+            text=message,
+            fg="#077822",
+            bg="#F8ECD1",
+            font=("Inter Light", 9)
+        )
+        success_label.place(x=75, y=160)
+        login_window.after(3000, success_label.destroy)
+
+    def show_error(message):
+        error_label = Label(
+            login_window,
+            text=message,
+            fg="#FF0101",
+            bg="#F8ECD1",
+            font=("Inter Light", 9)
+        )
+        error_label.place(x=75, y=160)
+        login_window.after(3000, error_label.destroy)
+
     if not username or not password:
-        messagebox.showerror("Error", "Please enter both username and password")
+        show_error("*Please enter both username and password")
         return
 
     isValid = logic.check_user(username, password)
 
     if isValid is True:
-        messagebox.showinfo("Success", "Login Success")
-        login_window.destroy()
-        run = Test()
-        run.run()
+        show_success("Login Successfully")
+        def open_main_app():
+            login_window.destroy()
+            run = StudentPanel()
+            run.run()
+        
+        login_window.after(2000, open_main_app)
     else:
-        messagebox.showerror("Error", "Invalid")
+        show_error("*Invalid username and password")
         password_entry.delete(0, 'end')
     
 def handle_sign_up(username_entry, password_entry):

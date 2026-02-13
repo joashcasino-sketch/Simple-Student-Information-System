@@ -7,8 +7,8 @@ sys.path.insert(0, str(backend_path))
 
 from login_handler import handle_sign_in, handle_sign_up
 
-OUTPUT_PATH = Path(__file__).resolve().parent
-ASSETS_PATH = OUTPUT_PATH.parent.parent.parent / "frontend" / "assets" / "frame0"
+BASE_DIR = Path(__file__).resolve().parent
+ASSETS_PATH = BASE_DIR.parent.parent.parent / "frontend" / "assets" / "frame0"
 LOGO_PATH = Path(__file__).resolve().parent.parent.parent / "assets" / "logo.png"
 
 def relative_to_assets(path: str) -> Path:
@@ -89,16 +89,6 @@ def create_login_window():
         font=("Inter", 11)
     )
     password_entry.place(x=180.0, y=253.0, width=130.0, height=26.0)
-
-    # Error message label (hidden initially)
-    invalid_message = Label(
-        window,
-        text="*Invalid username or password",
-        fg="#FF0101",
-        bg="#F8ECD1",
-        font=("Inter Light", 10)
-    )
-    # Don't place it yet - will be shown by handle_sign_in if needed
 
     # Buttons
     button_image_1 = PhotoImage(file=relative_to_assets("button_1.png"))
