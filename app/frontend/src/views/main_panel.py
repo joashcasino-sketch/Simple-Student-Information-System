@@ -77,7 +77,7 @@ class MainPanel: # Using PascalCase for classes is a Python standard
             image=self.program_button_image,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: print("Clicked"),
+            command=lambda: self.open_program(),
             relief="flat",
             activebackground="#DEB6AB",
             cursor="hand2",
@@ -158,7 +158,16 @@ class MainPanel: # Using PascalCase for classes is a Python standard
         self.tree = ttk.Treeview(self.window)
         self.tree.pack(expand=True, padx=20, pady=20)
 
+    def open_program(self):
+        from programs_panel import ProgramPanel
+        program = ProgramPanel()
+        program.run()
 
+    def switch_to_panel(self, panel):
+        if self.canvas:
+            self.canvas.destroy()
+
+        panel(self.window)
 
     def run(self):
         self.window.mainloop()

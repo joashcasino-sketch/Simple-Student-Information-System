@@ -1,5 +1,5 @@
 from pathlib import Path
-from tkinter import Canvas, Tk
+from tkinter import Button, Canvas, Tk
 
 BASE_DIV = Path(__file__).resolve().parent
 from main_panel import MainPanel
@@ -17,7 +17,21 @@ class StudentPanel(MainPanel):
         font=("Arial", 24),
         fill="Black",
         anchor="e"
-    )
+        )
+        self.program_button = Button(
+            self.window,
+            image=self.program_button_image,
+            borderwidth=0,
+            highlightthickness=0,
+            command= self.open_program,
+            relief="flat",
+            activebackground="#DEB6AB",
+            cursor="hand2",
+        )
+        
+    def open_program(self):
+        from programs_panel import ProgramPanel
+        self.switch_to_panel(ProgramPanel)
     
     def run(self):
         return super().run()
