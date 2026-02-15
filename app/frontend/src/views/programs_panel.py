@@ -9,8 +9,14 @@ class ProgramPanel(MainPanel):
         super().__init__()
         
     def setup_ui(self):
-
-        return super().setup_ui()
+        super().setup_ui()
+        self.canvas.create_text(
+            405,170,
+            text="Programs",
+            font=("Arial", 24),
+            fill="black",
+            anchor="e"
+        )
     
     def run(self):
         return super().run()
