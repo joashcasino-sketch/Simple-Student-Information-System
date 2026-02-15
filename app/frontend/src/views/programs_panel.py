@@ -2,9 +2,9 @@ from pathlib import Path
 from tkinter import Tk
 
 BASE_DIV = Path(__file__).resolve().parent
-from students_panel import StudentPanel
+from main_panel import MainPanel
 
-class ProgramPanel(StudentPanel):
+class ProgramPanel(MainPanel):
     def __init__(self):
         super().__init__()
         
