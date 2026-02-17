@@ -1,14 +1,14 @@
 from pathlib import Path
 
 BASE_DIV = Path(__file__).resolve().parent
-ASSETS_PATH = BASE_DIV.parent.parent.parent / "frontend" / "assets"
+ASSETS_PATH = BASE_DIV.parent.parent.parent.parent / "frontend" / "assets"
 
 from tkinter import Button, Canvas, PhotoImage, Tk, Label, ttk, Entry
 
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
 
-class MainPanel: # Using PascalCase for classes is a Python standard
+class ProgramPanel: # Using PascalCase for classes is a Python standard
     def __init__(self):
         self.window = Tk()
         self.window.geometry("1260x680")
@@ -173,5 +173,5 @@ class MainPanel: # Using PascalCase for classes is a Python standard
         self.window.mainloop()
 
 if __name__ == "__main__":
-    app = MainPanel()
+    app = ProgramPanel()
     app.run()
