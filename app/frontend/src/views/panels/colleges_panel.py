@@ -9,7 +9,7 @@ ASSETS_PATH = BASE_DIV.parent.parent.parent / "frontend" / "assets"
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
 
-class StudentPanel(Frame): 
+class CollegePanel(Frame): 
     def __init__(self, parent, controller):
         super().__init__(parent, bg="#F8ECD1") 
         self.controller = controller 
@@ -113,7 +113,8 @@ class StudentPanel(Frame):
         self.style.configure("Treeview.Heading", background="#884668", foreground="#D8A9C2", font=('Trebuchet MS', 10, 'bold'))
 
         self.tree = ttk.Treeview(self,
-            columns=('ID Number', 'Name', 'Gender', 'Year Level', 'Program', 'College'),
+            columns=(
+                'ID Number', 'Name', 'Gender', 'Year Level', 'Program', 'College'),
             show='tree headings')
 
         self.tree.column("#0", width=40, minwidth=40, stretch=False)
