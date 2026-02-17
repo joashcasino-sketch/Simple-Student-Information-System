@@ -2,22 +2,22 @@ from pathlib import Path
 import tkinter as tk
 
 BASE_DIV = Path(__file__).resolve().parent
-ASSETS_PATH = BASE_DIV.parent.parent.parent / "frontend" / "assets"
+ASSETS_PATH = BASE_DIV.parent.parent.parent / "assets"
 
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
 
-class MainPanel(tk.Tk):
+class MainPanel:
     def __init__(self):
-        super().__init__()
-        self.geometry("1260x680")
-        self.resizable(False, False)
-        self.title("Student Information System")
-        self.configure(bg="#F8ECD1")
+        self.root = tk.Tk()
+        self.root.geometry("1260x680")
+        self.root.resizable(False, False)
+        self.root.title("Student Information System")
+        self.root.configure(bg="#F8ECD1")
         self.current_panel = None
         self.panels = {}
 
-        self.container = tk.Frame(self)
+        self.container = tk.Frame(self.root)
         self.container.pack(fill="both", expand=True)
 
         self.create_all_panels()
@@ -39,33 +39,11 @@ class MainPanel(tk.Tk):
 
     def show_panel(self, name):
         panel = self.panels[name]
-        if self.current_panel and self.current_panel != panel:
-            self._animate_switch(self.current_panel, panel)
-        else:
-            panel.lift()
-            self.current_panel = panel
-
-    def _animate_switch(self, old_panel, new_panel, step=0):
-        total_steps = 10
-        width = self.winfo_width()
-
-        if step == 0:
-            new_panel.place(x=width, y=0, relwidth=1, relheight=1)
-            new_panel.lift()
-
-        if step <= total_steps:
-            offset = int(width * (1 - step / total_steps))
-            new_panel.place(x=offset, y=0, relwidth=1, relheight=1)
-            old_panel.place(x=-int(width * step / total_steps), y=0, relwidth=1, relheight=1)
-            self.after(16, lambda: self._animate_switch(old_panel, new_panel, step + 1))
-        else:
-            new_panel.place(x=0, y=0, relwidth=1, relheight=1)
-            old_panel.place(x=0, y=0, relwidth=1, relheight=1)
-            old_panel.lower()
-            self.current_panel = new_panel
+        panel.lift()
+        self.current_panel = panel
 
     def run(self):
-        self.mainloop()
+        self.root.mainloop()
 
 if __name__ == "__main__":
     app = MainPanel()

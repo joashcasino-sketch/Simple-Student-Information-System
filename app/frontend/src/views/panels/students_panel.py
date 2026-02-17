@@ -4,7 +4,7 @@ import tkinter as tk
 from tkinter import CENTER, Button, Canvas, Frame, PhotoImage, Label, ttk, Entry
 
 BASE_DIV = Path(__file__).resolve().parent
-ASSETS_PATH = BASE_DIV.parent.parent.parent / "frontend" / "assets"
+ASSETS_PATH = BASE_DIV.parent.parent.parent / "assets"
 
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)

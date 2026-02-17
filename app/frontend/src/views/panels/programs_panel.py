@@ -4,7 +4,7 @@ import tkinter as tk
 from tkinter import CENTER, Button, Canvas, Frame, PhotoImage, Label, ttk, Entry
 
 BASE_DIV = Path(__file__).resolve().parent
-ASSETS_PATH = BASE_DIV.parent.parent.parent / "frontend" / "assets"
+ASSETS_PATH = BASE_DIV.parent.parent.parent / "assets"
 
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
@@ -95,10 +95,14 @@ class ProgramPanel(Frame):
             relief="flat", activebackground="#F8ECD1", cursor="hand2",
         )
 
-        self.canvas.create_text(392, 175, text="Student", font=("Lato", 24), fill="#642D48", anchor="e")
+        self.canvas.create_text(
+            405, 175,
+            text="Program",
+            font=("Lato", 24),
+            fill="#642D48", anchor="e")
 
-        self.student_button.place(x=25.0, y=110.0, width=213.0, height=31)
-        self.program_button.place(x=15.0, y=160.0, width=216, height=31)
+        self.student_button.place(x=18.0, y=110.0, width=213.0, height=31)
+        self.program_button.place(x=20.0, y=160.0, width=216, height=31)
         self.college_button.place(x=16.0, y=210.0, width=215, height=31)
         self.setting_button.place(x=18.0, y=630.0, width=215, height=31)
         self.search_entry.place(x=280.0, y=112.0, width=600, height=26.0)
@@ -113,24 +117,19 @@ class ProgramPanel(Frame):
         self.style.configure("Treeview.Heading", background="#884668", foreground="#D8A9C2", font=('Trebuchet MS', 10, 'bold'))
 
         self.tree = ttk.Treeview(self,
-            columns=('ID Number', 'Name', 'Gender', 'Year Level', 'Program', 'College'),
+            columns=('Program Code', 'Program Name', 'College Designation'),
             show='tree headings')
 
         self.tree.column("#0", width=40, minwidth=40, stretch=False)
-        self.tree.column("ID Number", width=100, minwidth=100, stretch=False)
-        self.tree.column("Name", width=200, minwidth=200, stretch=False)
-        self.tree.column("Gender", width=105, minwidth=105, stretch=False)
-        self.tree.column("Year Level", width=100, minwidth=100, stretch=False)
-        self.tree.column("Program", width=200, minwidth=200, stretch=False)
-        self.tree.column("College", width=200, minwidth=200, stretch=False)
+        self.tree.column("Program Code", width=295, minwidth=100, stretch=False)
+        self.tree.column("Program Name", width=310, minwidth=200, stretch=False)
+        self.tree.column("College Designation", width=300, minwidth=200, stretch=False)
+
 
         self.tree.heading("#0", text="", anchor="w")
-        self.tree.heading('ID Number', text='ID Number', anchor=CENTER)
-        self.tree.heading('Name', text='Name')
-        self.tree.heading('Gender', text='Gender')
-        self.tree.heading('Year Level', text='Year Level')
-        self.tree.heading('Program', text='Program')
-        self.tree.heading('College', text='College')
+        self.tree.heading('Program Code', text='Program Code', anchor=CENTER)
+        self.tree.heading('Program Name', text='Program Name')
+        self.tree.heading('College Designation', text='College Designation')
 
         self.tree.bind('<Button-1>', lambda e: 'break' if self.tree.identify_region(e.x, e.y) == 'separator' else None)
         self.tree.place(x=280.0, y=200.0, width=950, height=450.0)
@@ -138,5 +137,5 @@ class ProgramPanel(Frame):
 if __name__ == "__main__":
     from main_panel import MainPanel
     app = MainPanel()
-    app.show_panel("student")
+    app.show_panel("program")
     app.run()
