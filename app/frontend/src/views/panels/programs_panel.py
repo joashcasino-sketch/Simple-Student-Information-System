@@ -96,6 +96,36 @@ class ProgramPanel(Frame):
             relief="flat", activebackground="#F8ECD1", cursor="hand2",
         )
 
+        self.add_button = Button(
+            self,
+            text="Add Program",
+            font=("Lato", 10, "bold"),
+            borderwidth=0, highlightthickness=0,
+            background="#85586F",
+            foreground="white",
+            relief="flat", activebackground="#F8ECD1", cursor="hand2",
+        )
+
+        self.edit_button = Button(
+            self,
+            text="Edit Program",
+            font=("Lato", 10, "bold"),
+            borderwidth=0, highlightthickness=0,
+            background="#85586F",
+            foreground="white",
+            relief="flat", activebackground="#F8ECD1", cursor="hand2",
+        )
+        
+        self.delete_button = Button(
+            self,
+            text="Delete Program",
+            font=("Lato", 10, "bold"),
+            borderwidth=0, highlightthickness=0,
+            background="#85586F",
+            foreground="white",
+            relief="flat", activebackground="#F8ECD1", cursor="hand2",
+        )
+
         self.canvas.create_text(
             405, 175,
             text="Program",
@@ -109,6 +139,9 @@ class ProgramPanel(Frame):
         self.search_entry.place(x=280.0, y=112.0, width=600, height=26.0)
         self.search_button.place(x=980.0, y=108.0, width=52, height=35.0)
         self.sort_button.place(x=1038.0, y=108.0, width=101, height=35.0)
+        self.add_button.place(x=450.0, y=165.0, width=90, height=30.0)
+        self.edit_button.place(x=550.0, y=165.0, width=90, height=30.0)
+        self.delete_button.place(x=650.0, y=165.0, width=100, height=30.0)
 
         self.canvas.pack(fill="x")
 

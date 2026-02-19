@@ -30,12 +30,15 @@ class MainPanel:
         from students_panel import StudentPanel
         from programs_panel import ProgramPanel
         from colleges_panel import CollegePanel
-        from student_controller
+        from student_controller import StudentController
+        from program_controller import ProgramController
+        from college_controller import CollegeController
+
 
         for PanelClass, ControllerClass, name in [
             (StudentPanel, StudentController, "student"),
-            (ProgramPanel, "program"),
-            (CollegePanel, "college")
+            (ProgramPanel, ProgramController, "program"),
+            (CollegePanel, CollegeController, "college")
         ]:
             frame = PanelClass(self.container, self)
             ControllerClass(views=frame)
