@@ -5,12 +5,11 @@ from pathlib import Path
 from tkinter import messagebox, Label
 
 
-
 BASE_DIR = Path(__file__).resolve().parent
-frontend_src_path = BASE_DIR.parent.parent / 'frontend' / 'src'
+frontend_src_path = BASE_DIR.parent.parent / 'frontend' / 'src' / 'views' / 'panels'
 sys.path.insert(0, str(frontend_src_path))
 
-from students_panel import StudentPanel
+from main_panel import MainPanel
 
 USER_CSV = BASE_DIR.parent / 'data' / 'users.csv'
 class Login_Logic:
@@ -79,7 +78,8 @@ def handle_sign_in(username_entry, password_entry, login_window):
         show_success("Login Successfully")
         def open_main_app():
             login_window.destroy()
-            run = StudentPanel()
+            run = MainPanel()
+            run.show_panel("student")
             run.run()
         
         login_window.after(2000, open_main_app)

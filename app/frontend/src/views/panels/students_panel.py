@@ -1,10 +1,11 @@
 from pathlib import Path
 import sys
 import tkinter as tk
+import csv
 from tkinter import CENTER, Button, Canvas, Frame, PhotoImage, Label, ttk, Entry
 
-BASE_DIV = Path(__file__).resolve().parent
-ASSETS_PATH = BASE_DIV.parent.parent.parent / "assets"
+BASE_DIR = Path(__file__).resolve().parent
+ASSETS_PATH = BASE_DIR.parent.parent.parent / "assets"
 
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
@@ -112,6 +113,7 @@ class StudentPanel(Frame):
         self.style.configure("Treeview", bg="#A6738D", fg="#A6738D", fieldbackground="#D8A9C2")
         self.style.configure("Treeview.Heading", background="#884668", foreground="#D8A9C2", font=('Trebuchet MS', 10, 'bold'))
 
+        # ← fix for Windows tag foreground colors
         self.tree = ttk.Treeview(self,
             columns=('ID Number', 'Name', 'Gender', 'Year Level', 'Program', 'College'),
             show='tree headings')
@@ -132,11 +134,42 @@ class StudentPanel(Frame):
         self.tree.heading('Program', text='Program')
         self.tree.heading('College', text='College')
 
+       
+
         self.tree.bind('<Button-1>', lambda e: 'break' if self.tree.identify_region(e.x, e.y) == 'separator' else None)
         self.tree.place(x=280.0, y=200.0, width=950, height=450.0)
+
+        self.populate_students()
+    
+    def populate_students(self):
+        # Clear existing rows
+        for row in self.tree.get_children():
+            self.tree.delete(row)
+
+        self.tree.tag_configure("odd", background="#DEB6AB", foreground="#000000")   # black
+        self.tree.tag_configure("even", background="#AC7D88", foreground="#FFFFFF")  # white
+        try:
+            csv_path = BASE_DIR.parent.parent.parent.parent / "backend" / "data" / "students.csv"
+            with open(csv_path, newline="", encoding="utf-8") as f:
+                reader = csv.DictReader(f)
+                for i, row in enumerate(reader):        # ← enumerate for index
+                    tag = "odd" if i % 2 == 0 else "even"
+                    self.tree.insert("", "end", text=str(i+1), values=(
+                        row["ID Number"],
+                        row["Name"],
+                        row["Gender"],
+                        row["Year Level"],
+                        row["Program"],
+                        row["College"]
+                    ), tags=(tag,))          
+        except FileNotFoundError:
+            print(f"CSV file not found at: {csv_path}")
+
 
 if __name__ == "__main__":
     from main_panel import MainPanel
     app = MainPanel()
     app.show_panel("student")
     app.run()
+
+    

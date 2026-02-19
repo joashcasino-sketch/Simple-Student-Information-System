@@ -17,7 +17,7 @@ class ProgramPanel(Frame):
 
     def setup_ui(self):
         self.canvas = Canvas(
-            self,                        # ← self, not self.window
+            self,                      
             width=1260, 
             height=680,
             bg="#F8ECD1",
@@ -38,7 +38,7 @@ class ProgramPanel(Frame):
             self,
             image=self.student_button_image,
             borderwidth=0, highlightthickness=0,
-            command=lambda: self.controller.show_panel("student"),  # ← controller
+            command=lambda: self.controller.show_panel("student"), 
             relief="flat", activebackground="#DEB6AB", cursor="hand2",
         )
 
@@ -47,7 +47,7 @@ class ProgramPanel(Frame):
             self,
             image=self.program_button_image,
             borderwidth=0, highlightthickness=0,
-            command=lambda: self.controller.show_panel("program"),  # ← controller
+            command=lambda: self.controller.show_panel("program"), 
             relief="flat", activebackground="#DEB6AB", cursor="hand2",
         )
 
@@ -133,6 +133,9 @@ class ProgramPanel(Frame):
 
         self.tree.bind('<Button-1>', lambda e: 'break' if self.tree.identify_region(e.x, e.y) == 'separator' else None)
         self.tree.place(x=280.0, y=200.0, width=950, height=450.0)
+    
+    def pupulate_programs():
+        pass
 
 if __name__ == "__main__":
     from main_panel import MainPanel
