@@ -1,10 +1,11 @@
+import csv
 from pathlib import Path
 import sys
 import tkinter as tk
 from tkinter import CENTER, Button, Canvas, Frame, PhotoImage, Label, ttk, Entry
 
-BASE_DIV = Path(__file__).resolve().parent
-ASSETS_PATH = BASE_DIV.parent.parent.parent / "assets"
+BASE_DIR = Path(__file__).resolve().parent
+ASSETS_PATH = BASE_DIR.parent.parent.parent / "assets"
 
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
@@ -117,25 +118,46 @@ class ProgramPanel(Frame):
         self.style.configure("Treeview.Heading", background="#884668", foreground="#D8A9C2", font=('Trebuchet MS', 10, 'bold'))
 
         self.tree = ttk.Treeview(self,
-            columns=('Program Code', 'Program Name', 'College Designation'),
+            columns=('Program Code', 'Program Name', 'College Code', 'College Name'),
             show='tree headings')
 
         self.tree.column("#0", width=40, minwidth=40, stretch=False)
-        self.tree.column("Program Code", width=295, minwidth=100, stretch=False)
-        self.tree.column("Program Name", width=310, minwidth=200, stretch=False)
-        self.tree.column("College Designation", width=300, minwidth=200, stretch=False)
-
+        self.tree.column("Program Code", width=150, minwidth=100, stretch=False)
+        self.tree.column("Program Name", width=305, minwidth=200, stretch=False)
+        self.tree.column("College Code", width=150, minwidth=200, stretch=False)
+        self.tree.column("College Name", width=300, minwidth=200, stretch=False)
 
         self.tree.heading("#0", text="", anchor="w")
         self.tree.heading('Program Code', text='Program Code', anchor=CENTER)
         self.tree.heading('Program Name', text='Program Name')
-        self.tree.heading('College Designation', text='College Designation')
+        self.tree.heading('College Code', text='College Code')
+        self.tree.heading('College Name', text='College Name')
 
         self.tree.bind('<Button-1>', lambda e: 'break' if self.tree.identify_region(e.x, e.y) == 'separator' else None)
         self.tree.place(x=280.0, y=200.0, width=950, height=450.0)
+
+        self.populate_programs()
     
-    def pupulate_programs():
-        pass
+    def populate_programs(self):
+        for row in self.tree.get_children():
+            self.tree.delete(row)
+
+        self.tree.tag_configure("odd", background="#DEB6AB", foreground="#000000")   # black
+        self.tree.tag_configure("even", background="#AC7D88", foreground="#FFFFFF")  # white
+        try:
+            csv_path = BASE_DIR.parent.parent.parent.parent / "backend" / "data" / "programs.csv"
+            with open(csv_path, newline="", encoding="utf-8") as f:
+                reader = csv.DictReader(f)
+                for i, row in enumerate(reader):        # ← enumerate for index
+                    tag = "odd" if i % 2 == 0 else "even"
+                    self.tree.insert("", "end", text=str(i+1), values=(
+                        row["Program Code"],
+                        row["Program Name"],
+                        row["College Code"],
+                        row["College Name"],
+                    ), tags=(tag,))          
+        except FileNotFoundError:
+            print(f"CSV file not found at: {csv_path}")
 
 if __name__ == "__main__":
     from main_panel import MainPanel
