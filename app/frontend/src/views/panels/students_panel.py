@@ -1,4 +1,5 @@
 from pathlib import Path
+from pydoc import text
 import sys
 import tkinter as tk
 import csv
@@ -96,7 +97,42 @@ class StudentPanel(Frame):
             relief="flat", activebackground="#F8ECD1", cursor="hand2",
         )
 
-        self.canvas.create_text(392, 175, text="Student", font=("Lato", 24), fill="#642D48", anchor="e")
+        self.add_button = Button(
+            self,
+            text="Add Student",
+            font=("Lato", 10, "bold"),
+            borderwidth=0, highlightthickness=0,
+            background="#85586F",
+            foreground="white",
+            relief="flat", activebackground="#F8ECD1", cursor="hand2",
+        )
+
+        self.edit_button = Button(
+            self,
+            text="Edit Student",
+            font=("Lato", 10, "bold"),
+            borderwidth=0, highlightthickness=0,
+            background="#85586F",
+            foreground="white",
+            relief="flat", activebackground="#F8ECD1", cursor="hand2",
+        )
+        
+        self.delete_button = Button(
+            self,
+            text="Delete Student",
+            font=("Lato", 10, "bold"),
+            borderwidth=0, highlightthickness=0,
+            background="#85586F",
+            foreground="white",
+            relief="flat", activebackground="#F8ECD1", cursor="hand2",
+        )
+
+        self.canvas.create_text(
+            392, 175,
+            text="Student",
+            font=("Lato", 24),
+            fill="#642D48",
+            anchor="e")
 
         self.student_button.place(x=25.0, y=110.0, width=213.0, height=31)
         self.program_button.place(x=15.0, y=160.0, width=216, height=31)
@@ -105,6 +141,10 @@ class StudentPanel(Frame):
         self.search_entry.place(x=280.0, y=112.0, width=600, height=26.0)
         self.search_button.place(x=980.0, y=108.0, width=52, height=35.0)
         self.sort_button.place(x=1038.0, y=108.0, width=101, height=35.0)
+        self.add_button.place(x=450.0, y=165.0, width=90, height=30.0)
+        self.edit_button.place(x=550.0, y=165.0, width=90, height=30.0)
+        self.delete_button.place(x=650.0, y=165.0, width=100, height=30.0)
+
 
         self.canvas.pack(fill="x")
 
