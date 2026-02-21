@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+from tkinter import messagebox
 
 BASE_DIR = Path(__file__).resolve().parent
 student_view_path = BASE_DIR.parent.parent.parent / 'frontend' / 'src' / 'views' / 'panels'
@@ -13,10 +14,14 @@ class StudentController:
         self.model = StudentModel()
         self.views = views
 
-    def add_student(self):
-        data = self.views.get_form_data()
-        success = self.model.add_student(data)
-        self.views.display_result(success)
+    def add_student(self, student_data):
+        success = self.model.add_student(student_data)
+
+        if success:
+            messagebox.showinfo("Success", "Student Added Successfully!")
+            self.views.refresh_student_list()
+        else:
+            messagebox.showerror("Error", "Student ID Already Exist!")
 
     def update_student(self):
         pass

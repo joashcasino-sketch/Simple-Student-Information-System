@@ -7,6 +7,10 @@ from tkinter import CENTER, Button, Canvas, Frame, PhotoImage, Label, ttk, Entry
 
 BASE_DIR = Path(__file__).resolve().parent
 ASSETS_PATH = BASE_DIR.parent.parent.parent / "assets"
+CONTROLLER_PATH = BASE_DIR.parent.parent.parent.parent / 'backend' / 'src' / 'Controller'
+
+sys.path.insert(0, str(CONTROLLER_PATH))
+from student_controller import StudentController
 
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
@@ -14,7 +18,8 @@ def relative_to_assets(path: str) -> Path:
 class StudentPanel(Frame): 
     def __init__(self, parent, controller):
         super().__init__(parent, bg="#F8ECD1") 
-        self.controller = controller 
+        self.controller = controller
+        self.student_controller = StudentController(self) 
         self.setup_ui()
 
     def setup_ui(self):
@@ -104,6 +109,7 @@ class StudentPanel(Frame):
             borderwidth=0, highlightthickness=0,
             background="#85586F",
             foreground="white",
+            command=self.open_add_dialog,
             relief="flat", activebackground="#F8ECD1", cursor="hand2",
         )
 
@@ -205,6 +211,9 @@ class StudentPanel(Frame):
         except FileNotFoundError:
             print(f"CSV file not found at: {csv_path}")
 
+    def open_add_dialog(self):
+        from add_student_dialog import AddStudentDialog
+        AddStudentDialog(self, self.student_controller)
 
 if __name__ == "__main__":
     from main_panel import MainPanel

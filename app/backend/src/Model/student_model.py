@@ -19,8 +19,16 @@ class StudentModel:
                 return True
             
         except Exception as e:
-            print(f"Error adding students" {e})
+            print(f"Error adding students: {e}")
             return False
         
-    def student_exist(self, student_data):
-        
+    def student_exist(self, student_id):
+        try:
+            with open(self.csv_file, 'r') as file:
+                reader = csv.DictReader(file)
+                for row in reader:
+                    if row['ID Number'] == student_id:
+                        return True
+            return False
+        except FileNotFoundError:
+            return False
