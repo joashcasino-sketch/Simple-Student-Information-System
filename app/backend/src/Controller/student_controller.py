@@ -12,3 +12,20 @@ class StudentController:
     def __init__(self, views):
         self.model = StudentModel()
         self.views = views
+
+    def add_student(self):
+        data = self.views.get_form_data()
+        success = self.model.add_student(data)
+        self.views.display_result(success)
+
+    def update_student(self):
+        pass
+
+    def delete_student(self):
+        pass
+
+    def search_student(self):
+        pass
+
+    def sort_student(self):
+        pass

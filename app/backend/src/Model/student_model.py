@@ -1,3 +1,26 @@
+import csv
+from pathlib import Path
+
+student_csv = Path(__file__).resolve().parent / 'data' / 'students.csv'
 class StudentModel:
     def __init__(self):
-        pass
+        self.csv_file = student_csv
+        self.headers = ['ID Number', 'Name,Gender', 'Year Level', 'Program', 'College']
+
+    def add_student(self, student_data):
+        try:
+            if self.student_exist(student_data.get('ID Number')):
+                return False
+            
+            with open(self.csv_file, 'a', newline='') as file:
+                writer = csv.DictWriter(file, fieldnames=self.headers)
+                writer.writerow(student_data)
+
+                return True
+            
+        except Exception as e:
+            print(f"Error adding students" {e})
+            return False
+        
+    def student_exist(self, student_data):
+        
