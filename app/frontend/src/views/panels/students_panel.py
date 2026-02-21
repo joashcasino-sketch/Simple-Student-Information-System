@@ -3,7 +3,7 @@ from pydoc import text
 import sys
 import tkinter as tk
 import csv
-from tkinter import CENTER, Button, Canvas, Frame, PhotoImage, Label, ttk, Entry
+from tkinter import CENTER, Button, Canvas, Frame, PhotoImage, Label, ttk, Entry, messagebox
 
 BASE_DIR = Path(__file__).resolve().parent
 ASSETS_PATH = BASE_DIR.parent.parent.parent / "assets"
@@ -132,6 +132,7 @@ class StudentPanel(Frame):
             background="#85586F",
             foreground="white",
             relief="flat", activebackground="#F8ECD1", cursor="hand2",
+            command=self.delete_selected_student
         )
 
         self.canvas.create_text(
@@ -219,6 +220,18 @@ class StudentPanel(Frame):
         from add_student_dialog import AddStudentDialog
         AddStudentDialog(self, self.student_controller)
 
+    def delete_selected_student(self):
+        selected = self.tree.selection()
+        
+        if not selected:
+            messagebox.showwarning("No Selection", "Please select a student to delete.")
+            return
+        
+        item = self.tree.item(selected[0])
+        student_id = item['values'][0]
+
+        self.student_controller.delete_student(str(student_id))
+
     def setup_buttons(self, user_role):
         if user_role != 'admin':
             self.delete_button.config(state="disabled")
@@ -231,7 +244,7 @@ class StudentPanel(Frame):
 
 if __name__ == "__main__":
     from main_panel import MainPanel
-    app = MainPanel()
+    app = MainPanel(user_role="admin")
     app.show_panel("student")
     app.run()
 

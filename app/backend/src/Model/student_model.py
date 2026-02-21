@@ -32,3 +32,30 @@ class StudentModel:
             return False
         except FileNotFoundError:
             return False
+
+    def delete_student(self, student_id):
+        try:
+            rows = []
+            found = False
+
+            with open(self.csv_file, 'r', newline='') as file:
+                reader = csv.DictReader(file)
+                for row in reader:
+                    if row['ID Number'] == student_id:
+                        found = True
+                    else:
+                        rows.append(row)
+            
+            if not found:
+                return False
+
+            with open(self.csv_file, 'w', newline='') as file:
+                writer = csv.DictWriter(file, fieldnames=self.headers)
+                writer.writeheader()
+                writer.writerows(rows)
+
+            return True
+    
+        except Exception as e:
+            print(f"Error deleting student {e}")
+            return False
