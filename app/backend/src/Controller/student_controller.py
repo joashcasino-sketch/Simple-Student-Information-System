@@ -9,19 +9,26 @@ sys.path.insert(0, str(student_view_path))
 sys.path.insert(0, str(student_model_path))
 
 from student_model import StudentModel
+
 class StudentController:
     def __init__(self, views):
         self.model = StudentModel()
         self.views = views
 
-    def add_student(self, student_data):
+    def add_student_from_dialog(self, student_data):
         success = self.model.add_student(student_data)
 
         if success:
             messagebox.showinfo("Success", "Student Added Successfully!")
-            self.views.refresh_student_list()
+            self.views.populate_students()
         else:
             messagebox.showerror("Error", "Student ID Already Exist!")
+        return success
+    
+    def add_student(self):
+        data = self.views.get_form_data()
+        success = self.model.add_student(data)
+        self.views.display_result(success)
 
     def update_student(self):
         pass

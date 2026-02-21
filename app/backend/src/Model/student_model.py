@@ -1,11 +1,11 @@
 import csv
 from pathlib import Path
 
-student_csv = Path(__file__).resolve().parent / 'data' / 'students.csv'
+student_csv = Path(__file__).resolve().parent.parent.parent / 'data' / 'students.csv'
 class StudentModel:
     def __init__(self):
         self.csv_file = student_csv
-        self.headers = ['ID Number', 'Name,Gender', 'Year Level', 'Program', 'College']
+        self.headers = ['ID Number', 'Name', 'Gender', 'Year Level', 'Program', 'College']
 
     def add_student(self, student_data):
         try:
