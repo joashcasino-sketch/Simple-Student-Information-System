@@ -16,10 +16,11 @@ def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
 
 class StudentPanel(Frame): 
-    def __init__(self, parent, controller):
+    def __init__(self, parent, controller, user_role="user"):
         super().__init__(parent, bg="#F8ECD1") 
         self.controller = controller
-        self.student_controller = StudentController(self) 
+        self.user_role = user_role
+        self.student_controller = StudentController(self, user_role) 
         self.setup_ui()
 
     def setup_ui(self):
@@ -186,6 +187,7 @@ class StudentPanel(Frame):
         self.tree.place(x=280.0, y=200.0, width=950, height=450.0)
 
         self.populate_students()
+        self.setup_buttons(self.user_role)
     
     def populate_students(self):
         # Clear existing rows
@@ -212,8 +214,20 @@ class StudentPanel(Frame):
             print(f"CSV file not found at: {csv_path}")
 
     def open_add_dialog(self):
+        dialog_path = Path(__file__).resolve().parent.parent / "dialogs"
+        sys.path.insert(0, str(dialog_path))
         from add_student_dialog import AddStudentDialog
         AddStudentDialog(self, self.student_controller)
+
+    def setup_buttons(self, user_role):
+        if user_role != 'admin':
+            self.delete_button.config(state="disabled")
+            self.delete_button.configure(background="#A49A97")
+            self.edit_button.config(state="disabled")
+            self.edit_button.configure(background="#A49A97")
+        else:
+            self.delete_button.config(state="normal")
+            self.edit_button.config(state="normal")
 
 if __name__ == "__main__":
     from main_panel import MainPanel

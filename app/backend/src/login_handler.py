@@ -24,20 +24,20 @@ class Login_Logic:
         if not Path(self.csv_path).exists():
             with open(self.csv_path, 'w', newline='', encoding='utf-8') as file:
                 writer = csv.writer(file)
-                writer.writerow(['username', 'password'])
+                writer.writerow(['username', 'password', 'role'])
     def check_user(self, username, password):
         with open(self.csv_path, mode='r') as file:
             reader = csv.DictReader(file)
 
             for line in reader:
                 if line['username'] == username and line['password'] == password:
-                    return True
-            return False
+                    return line.get('role', 'user')
+            return None
     
-    def register_user(self, username, password):
+    def register_user(self, username, password, role='user'):
         with open(self.csv_path, mode='a', newline='') as file:
             writer = csv.writer(file)
-            writer.writerow([username, password])
+            writer.writerow([username, password, role])
         return True
 
     
@@ -72,14 +72,13 @@ def handle_sign_in(username_entry, password_entry, login_window):
         show_error("*Please enter both username and password")
         return
 
-    isValid = logic.check_user(username, password)
+    role = logic.check_user(username, password)
 
-    if isValid is True:
+    if role:
         show_success("Login Successfully")
         def open_main_app():
             login_window.destroy()
-            run = MainPanel()
-            run.show_panel("student")
+            run = MainPanel(user_role=role)
             run.run()
         
         login_window.after(2000, open_main_app)

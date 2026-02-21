@@ -13,7 +13,7 @@ class AddStudentDialog:
         self.dialog.resizable(False, False)
         self.dialog.grab_set()  # Make it modal
         
-        self._create_widgets()
+        self.create_widgets()
         
         # Center the window
         self.dialog.transient(parent)
@@ -25,7 +25,7 @@ class AddStudentDialog:
         y = (self.dialog.winfo_screenheight() // 2) - (self.dialog.winfo_height() // 2)
         self.dialog.geometry(f'+{x}+{y}')
     
-    def _create_widgets(self):
+    def create_widgets(self):
         # Title
         title = tk.Label(
             self.dialog,
@@ -88,7 +88,7 @@ class AddStudentDialog:
             background="#85586F",
             foreground="white",
             width=12,
-            command=self._on_save,
+            command=self.on_save,
             cursor="hand2"
         )
         save_btn.pack(side="left", padx=10)
@@ -106,7 +106,7 @@ class AddStudentDialog:
         )
         cancel_btn.pack(side="left", padx=10)
     
-    def _on_save(self):
+    def on_save(self):
         # Collect form data
         student_data = {
             'ID Number': self.id_entry.get().strip(),

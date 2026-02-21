@@ -1,3 +1,4 @@
+from email import message
 import sys
 from pathlib import Path
 from tkinter import messagebox
@@ -11,9 +12,10 @@ sys.path.insert(0, str(student_model_path))
 from student_model import StudentModel
 
 class StudentController:
-    def __init__(self, views):
+    def __init__(self, views, user_role):
         self.model = StudentModel()
         self.views = views
+        self.user_role = user_role
 
     def add_student_from_dialog(self, student_data):
         success = self.model.add_student(student_data)
@@ -25,16 +27,17 @@ class StudentController:
             messagebox.showerror("Error", "Student ID Already Exist!")
         return success
     
-    def add_student(self):
-        data = self.views.get_form_data()
-        success = self.model.add_student(data)
-        self.views.display_result(success)
-
     def update_student(self):
         pass
 
-    def delete_student(self):
-        pass
+    def delete_student(self, student_id):
+        if self.user_role != 'admin':
+            messagebox.showerror("Access Denied!", "You don't have permission to delete user!")
+            return
+        success = self.model.delete_student(student_id)
+        if success:
+            messagebox.showinfo("Success", "Student deleted successfully")
+            self.views.populate_students()
 
     def search_student(self):
         pass
