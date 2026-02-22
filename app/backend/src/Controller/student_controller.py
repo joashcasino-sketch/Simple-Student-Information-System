@@ -1,6 +1,7 @@
 import sys
 from pathlib import Path
 from tkinter import messagebox
+from unittest import result
 
 BASE_DIR = Path(__file__).resolve().parent
 student_view_path = BASE_DIR.parent.parent.parent / 'frontend' / 'src' / 'views' / 'panels'
@@ -44,8 +45,12 @@ class StudentController:
         else:
             messagebox.showerror("Error", "Student not found.")
 
-    def search_student(self):
-        pass
+    def search_student(self, query):
+        try:
+            results = self.model.search_student(query)
+            self.views.populate_students(results)
+        except Exception as e:
+            print(f"Search error: {e}")
 
     def sort_student(self):
         pass

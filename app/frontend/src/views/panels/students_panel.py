@@ -183,8 +183,6 @@ class StudentPanel(Frame):
         self.tree.heading('Program', text='Program')
         self.tree.heading('College', text='College')
 
-       
-
         self.tree.bind('<Button-1>', lambda e: 'break' if self.tree.identify_region(e.x, e.y) == 'separator' else None)
         self.tree.place(x=280.0, y=200.0, width=950, height=450.0)
 
@@ -229,7 +227,16 @@ class StudentPanel(Frame):
             return
 
         item = self.tree.item(selected[0])
-        student_data = item['values'] 
+        values = item['values'] 
+
+        student_data = {
+        'ID Number': str(values[0]),
+        'Name': values[1],
+        'Gender': values[2],
+        'Year Level': str(values[3]),
+        'Program': values[4],
+        'College': values[5]
+        }
 
         dialog_path = Path(__file__).resolve().parent.parent / "dialogs"
         sys.path.insert(0, str(dialog_path))

@@ -46,15 +46,15 @@ class StudentModel:
                         rows.append(student_data)
                         found = True
                     else:
-                        rows.append(rows)
+                        rows.append(row)
 
             if not found:
                 return False
             
-            with open(self.csv_file, 'a', newline='', encoding='utf-8') as file:
+            with open(self.csv_file, 'w', newline='', encoding='utf-8') as file:
                 writer = csv.DictWriter(file, fieldnames=self.headers)
                 writer.writeheader()
-                writer.writerow(rows)
+                writer.writerows(rows)
 
             return True
 
@@ -88,3 +88,23 @@ class StudentModel:
         except Exception as e:
             print(f"Error deleting student {e}")
             return False
+    
+    def search_student(self, query):
+        try:
+            results = []
+            query = query.lower().strip()
+
+            with open(self.csv_file, 'r', newline='', encoding='utf-8') as file:
+                reader = csv.DictReader(file)
+                for row in reader:
+                    if any(query in str(value).lower() for value in row.values()):
+                        results.append(row)
+
+            return results
+        
+        except FileNotFoundError:
+            return []
+        
+        except Exception as e:
+            print(f"Search student error: {e}")
+            return []
