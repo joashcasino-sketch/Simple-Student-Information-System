@@ -31,19 +31,10 @@ class StudentController:
         pass
 
     def delete_student(self, student_id):
-        if self.user_role != 'admin':
-            messagebox.showerror("Access Denied!", "You don't have permission to delete user!")
-            return
-        
-        confirm = messagebox.askyesno("Confirm Delete", f"Are you sure you want to delete student {student_id}?")
-        if not confirm:
-            return
-        
         success = self.model.delete_student(student_id)
         if success:
             messagebox.showinfo("Success", "Student deleted successfully")
             self.views.populate_students()
-
         else:
             messagebox.showerror("Error", "Student not found.")
 

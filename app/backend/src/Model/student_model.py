@@ -12,7 +12,7 @@ class StudentModel:
             if self.student_exist(student_data.get('ID Number')):
                 return False
             
-            with open(self.csv_file, 'a', newline='') as file:
+            with open(self.csv_file, 'a', newline='', encoding='utf-8') as file:
                 writer = csv.DictWriter(file, fieldnames=self.headers)
                 writer.writerow(student_data)
 
@@ -24,7 +24,7 @@ class StudentModel:
         
     def student_exist(self, student_id):
         try:
-            with open(self.csv_file, 'r') as file:
+            with open(self.csv_file, 'r', encoding='utf-8') as file:
                 reader = csv.DictReader(file)
                 for row in reader:
                     if row['ID Number'] == student_id:
@@ -49,7 +49,7 @@ class StudentModel:
             if not found:
                 return False
 
-            with open(self.csv_file, 'w', newline='') as file:
+            with open(self.csv_file, 'w', newline='', encoding="utf-8") as file:
                 writer = csv.DictWriter(file, fieldnames=self.headers)
                 writer.writeheader()
                 writer.writerows(rows)
