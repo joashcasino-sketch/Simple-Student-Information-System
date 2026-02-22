@@ -1,4 +1,3 @@
-from email import message
 import sys
 from pathlib import Path
 from tkinter import messagebox
@@ -27,8 +26,15 @@ class StudentController:
             messagebox.showerror("Error", "Student ID Already Exist!")
         return success
     
-    def update_student(self):
-        pass
+    def update_student(self, student_data):
+        success = self.model.edit_student(student_data)
+
+        if success:
+            messagebox.showinfo("Success", "Student has been updated!")
+            self.views.populate_students()
+        else:
+            messagebox.showerror("Error", "Please enter all required fields!")
+        return success
 
     def delete_student(self, student_id):
         success = self.model.delete_student(student_id)

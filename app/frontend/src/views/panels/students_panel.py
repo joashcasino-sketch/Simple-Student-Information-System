@@ -122,6 +122,7 @@ class StudentPanel(Frame):
             background="#85586F",
             foreground="white",
             relief="flat", activebackground="#F8ECD1", cursor="hand2",
+            command=self.open_edit_dialog
         )
         
         self.delete_button = Button(
@@ -219,6 +220,21 @@ class StudentPanel(Frame):
         sys.path.insert(0, str(dialog_path))
         from add_student_dialog import AddStudentDialog
         AddStudentDialog(self, self.student_controller)
+
+    def open_edit_dialog(self):
+        selected = self.tree.selection()
+
+        if not selected:
+            messagebox.showwarning("No Selection", "Please select a student to edit.")
+            return
+
+        item = self.tree.item(selected[0])
+        student_data = item['values'] 
+
+        dialog_path = Path(__file__).resolve().parent.parent / "dialogs"
+        sys.path.insert(0, str(dialog_path))
+        from edit_student_dialog import UpdateStudentDialog
+        UpdateStudentDialog(self, self.student_controller, student_data)
 
     def delete_selected_student(self):
         selected = self.tree.selection()

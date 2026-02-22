@@ -11,7 +11,7 @@ class AddStudentDialog:
         self.dialog.title("Add Student")
         self.dialog.geometry("400x500")
         self.dialog.resizable(False, False)
-        self.dialog.grab_set()  # Make it modal
+        self.dialog.grab_set() 
         
         self.create_widgets()
         
