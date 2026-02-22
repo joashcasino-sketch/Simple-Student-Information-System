@@ -84,13 +84,14 @@ class StudentPanel(Frame):
             bd=0, bg="#DEB6AB", fg="#000716",
             highlightthickness=0, font=("Inter", 11)
         )
+        self.search_entry.bind("<Return>", lambda e: self.on_search())
 
         self.search_button_image = PhotoImage(file=relative_to_assets("search_button.png"))
         self.search_button = Button(
             self,
             image=self.search_button_image,
             borderwidth=0, highlightthickness=0,
-            command=lambda: print("Clicked"),
+            command=self.on_search,
             relief="flat", activebackground="#F8ECD1", cursor="hand2",
         )
 
@@ -162,7 +163,6 @@ class StudentPanel(Frame):
         self.style.configure("Treeview", bg="#A6738D", fg="#A6738D", fieldbackground="#D8A9C2")
         self.style.configure("Treeview.Heading", background="#884668", foreground="#D8A9C2", font=('Trebuchet MS', 10, 'bold'))
 
-        # ← fix for Windows tag foreground colors
         self.tree = ttk.Treeview(self,
             columns=('ID Number', 'Name', 'Gender', 'Year Level', 'Program', 'College'),
             show='tree headings')
@@ -189,27 +189,30 @@ class StudentPanel(Frame):
         self.populate_students()
         self.setup_buttons(self.user_role)
     
-    def populate_students(self):
-        # Clear existing rows
+    def populate_students(self, data=None):
         for row in self.tree.get_children():
             self.tree.delete(row)
 
-        self.tree.tag_configure("odd", background="#DEB6AB", foreground="#000000")   # black
-        self.tree.tag_configure("even", background="#AC7D88", foreground="#FFFFFF")  # white
+        self.tree.tag_configure("odd", background="#DEB6AB", foreground="#000000")  
+        self.tree.tag_configure("even", background="#AC7D88", foreground="#FFFFFF") 
+
         try:
-            csv_path = BASE_DIR.parent.parent.parent.parent / "backend" / "data" / "students.csv"
-            with open(csv_path, newline="", encoding="utf-8") as f:
-                reader = csv.DictReader(f)
-                for i, row in enumerate(reader):        # ← enumerate for index
-                    tag = "odd" if i % 2 == 0 else "even"
-                    self.tree.insert("", "end", text=str(i+1), values=(
-                        row["ID Number"],
-                        row["Name"],
-                        row["Gender"],
-                        row["Year Level"],
-                        row["Program"],
-                        row["College"]
-                    ), tags=(tag,))          
+            if data is None:
+                csv_path = BASE_DIR.parent.parent.parent.parent / "backend" / "data" / "students.csv"
+                with open(csv_path, newline="", encoding="utf-8") as f:
+                    reader = csv.DictReader(f)
+                    data = list(reader)
+
+            for i, row in enumerate(data):       
+                tag = "odd" if i % 2 == 0 else "even"
+                self.tree.insert("", "end", text=str(i+1), values=(
+                    row["ID Number"],
+                    row["Name"],
+                    row["Gender"],
+                    row["Year Level"],
+                    row["Program"],
+                    row["College"]
+                ), tags=(tag,))          
         except FileNotFoundError:
             print(f"CSV file not found at: {csv_path}")
 
@@ -264,6 +267,13 @@ class StudentPanel(Frame):
         else:
             self.delete_button.config(state="normal")
             self.edit_button.config(state="normal")
+
+    def on_search(self):
+        query = self.search_entry.get().strip()
+        if query:
+            self.student_controller.search_student(query)
+        else:
+            self.populate_students()
 
 if __name__ == "__main__":
     from main_panel import MainPanel
