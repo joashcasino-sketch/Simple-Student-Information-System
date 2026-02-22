@@ -1,4 +1,10 @@
+from pathlib import Path
 import tkinter as tk
+
+asset_path = Path(__file__).resolve().parent.parent.parent.parent / 'assets'
+
+def relative_to_assets(path: str) -> Path:
+    return asset_path / Path(path)
 
 class SortDropdown:
     def __init__(self, parent, on_select_callback):
@@ -9,8 +15,10 @@ class SortDropdown:
         self.sort_column = "Name"
         self.sort_reverse = False
 
+        self.sort_button_image = tk.PhotoImage(file=relative_to_assets("sort_button.png"))
         self.button = tk.Button(
             parent,
+            image=self.sort_button_image,
             text="Sort By ▾",
             font=("Lato", 10),
             bg="#85586F", fg="white",
@@ -32,7 +40,7 @@ class SortDropdown:
 
         self.dropdown_win = tk.Toplevel(self.parent)
         self.dropdown_win.wm_overrideredirect(True)
-        self.dropdown_win.geometry(f"120x180+{x}+{y}")
+        self.dropdown_win.geometry(f"100x165+{x}+{y}")
         self.dropdown_win.configure(bg="#85586F")
 
         options = ['ID Number', 'Name', 'Gender', 'Year Level', 'Program', 'College']

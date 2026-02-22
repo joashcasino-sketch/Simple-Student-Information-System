@@ -160,7 +160,7 @@ class StudentPanel(Frame):
         self.setting_button.place(x=18.0, y=630.0, width=215, height=31)
         self.search_entry.place(x=280.0, y=112.0, width=600, height=26.0)
         self.search_button.place(x=980.0, y=108.0, width=52, height=35.0)
-        self.sort_dropdown.place(x=1038.0, y=108.0, width=120, height=35.0)
+        self.sort_dropdown.place(x=1038.0, y=108.0, width=98, height=35.0)
         self.add_button.place(x=450.0, y=165.0, width=90, height=30.0)
         self.edit_button.place(x=550.0, y=165.0, width=90, height=30.0)
         self.delete_button.place(x=650.0, y=165.0, width=100, height=30.0)
