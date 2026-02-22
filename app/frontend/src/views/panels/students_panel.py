@@ -4,10 +4,15 @@ import sys
 import tkinter as tk
 import csv
 from tkinter import CENTER, Button, Canvas, Frame, PhotoImage, Label, StringVar, ttk, Entry, messagebox
+from tkinter import dialog
 
 BASE_DIR = Path(__file__).resolve().parent
 ASSETS_PATH = BASE_DIR.parent.parent.parent / "assets"
 CONTROLLER_PATH = BASE_DIR.parent.parent.parent.parent / 'backend' / 'src' / 'Controller'
+dialog_path = BASE_DIR.parent / 'dialogs'
+
+sys.path.insert(0, str(dialog_path))
+from sort_dropdown import SortDropdown
 
 sys.path.insert(0, str(CONTROLLER_PATH))
 from student_controller import StudentController
@@ -21,8 +26,6 @@ class StudentPanel(Frame):
         self.controller = controller
         self.user_role = user_role
         self.student_controller = StudentController(self, user_role)
-        self.sort_column = "Name"
-        self.sort_reverse = False
         self.setup_ui()
 
     def setup_ui(self):
@@ -106,16 +109,10 @@ class StudentPanel(Frame):
         #     relief="flat", activebackground="#F8ECD1", cursor="hand2",
         # )
 
-        self.sort_variable = StringVar(value="Sort by")
-        self.sort_dropdown = ttk.Combobox(
+        self.sort_dropdown = SortDropdown(
             self,
-            textvariable=self.sort_variable,
-            values=['ID Number', 'Name', 'Gender', 'Year Level', 'Program', 'College'],
-            state='readonly',
-            font=("Lato", 10),
-            width=12
+            on_select_callback=self.student_controller.sort_student
         )
-        self.sort_dropdown.bind("<<ComboboxSelected>>", self.on_sort)
 
         self.add_button = Button(
             self,
@@ -163,7 +160,7 @@ class StudentPanel(Frame):
         self.setting_button.place(x=18.0, y=630.0, width=215, height=31)
         self.search_entry.place(x=280.0, y=112.0, width=600, height=26.0)
         self.search_button.place(x=980.0, y=108.0, width=52, height=35.0)
-        self.sort_dropdown.place(x=1038.0, y=108.0, width=101, height=35.0)
+        self.sort_dropdown.place(x=1038.0, y=108.0, width=120, height=35.0)
         self.add_button.place(x=450.0, y=165.0, width=90, height=30.0)
         self.edit_button.place(x=550.0, y=165.0, width=90, height=30.0)
         self.delete_button.place(x=650.0, y=165.0, width=100, height=30.0)
@@ -287,19 +284,6 @@ class StudentPanel(Frame):
             self.student_controller.search_student(query)
         else:
             self.populate_students()
-
-    def on_sort(self, event=None):
-        column = self.sort_variable.get()
-        if column == "Sort By":
-            return
-        
-        if column == self.sort_column:
-            self.sort_reverse = not self.sort_reverse
-        else:
-            self.sort_column = column
-            self.sort_reverse = False
-        
-        self.student_controller.sort_student(self.sort_column, self.sort_reverse)
 
 if __name__ == "__main__":
     from main_panel import MainPanel

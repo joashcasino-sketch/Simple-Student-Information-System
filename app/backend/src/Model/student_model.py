@@ -108,3 +108,17 @@ class StudentModel:
         except Exception as e:
             print(f"Search student error: {e}")
             return []
+        
+    def sort_student(self, column, reverse=False):
+        try:
+            with open(self.csv_file, 'r', newline='', encoding='utf-8') as file:
+                reader = csv.DictReader(file)
+                rows = list(reader)
+
+            rows.sort(key=lambda row: row[column].lower(), reverse=reverse)
+            return rows
+        except FileNotFoundError:
+            return []
+        except Exception as e:
+            print(f"Sort student error: {e}")
+            return []

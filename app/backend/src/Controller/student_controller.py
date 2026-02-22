@@ -1,7 +1,6 @@
 import sys
 from pathlib import Path
 from tkinter import messagebox
-from unittest import result
 
 BASE_DIR = Path(__file__).resolve().parent
 student_view_path = BASE_DIR.parent.parent.parent / 'frontend' / 'src' / 'views' / 'panels'
@@ -52,5 +51,10 @@ class StudentController:
         except Exception as e:
             print(f"Search error: {e}")
 
-    def sort_student(self):
-        pass
+    def sort_student(self, column, reverse=False):
+        try:
+            results = self.model.sort_student(column, reverse)
+            self.views.populate_students(results)
+        except Exception as e:
+            print(f"Sort error: {e}")
+        
