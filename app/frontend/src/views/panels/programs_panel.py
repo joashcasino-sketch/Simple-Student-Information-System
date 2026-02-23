@@ -3,6 +3,7 @@ from pathlib import Path
 import sys
 import tkinter as tk
 from tkinter import CENTER, Button, Canvas, Frame, PhotoImage, Label, ttk, Entry
+from tkinter import messagebox
 
 BASE_DIR = Path(__file__).resolve().parent
 ASSETS_PATH = BASE_DIR.parent.parent.parent / "assets"
@@ -124,6 +125,7 @@ class ProgramPanel(Frame):
             background="#85586F",
             foreground="white",
             relief="flat", activebackground="#F8ECD1", cursor="hand2",
+            command=self.open_edit_dialog
         )
         
         self.delete_button = Button(
@@ -181,7 +183,7 @@ class ProgramPanel(Frame):
 
         self.populate_programs()
     
-    def populate_programs(self):
+    def populate_programs(self, data=None):
         for row in self.tree.get_children():
             self.tree.delete(row)
 
@@ -208,6 +210,27 @@ class ProgramPanel(Frame):
         from add_program_dialog import AddProgramDialog
         AddProgramDialog(self, self.program_controller)
 
+    def open_edit_dialog(self):
+        selected = self.tree.selection()
+
+        if not selected:
+            messagebox.showwarning("No Selection", "Please select a program to edit.")
+            return
+
+        item = self.tree.item(selected[0])
+        values = item['values'] 
+
+        program_data = {
+        'Program Code': values[0],
+        'Program Name': values[1],
+        'College Code': values[2],
+        'College Name': values[3],
+        }
+
+        dialog_path = Path(__file__).resolve().parent.parent / "dialogs"
+        sys.path.insert(0, str(dialog_path))
+        from edit_program_dialog import UpdateProgramDialog
+        UpdateProgramDialog(self, self.program_controller, program_data)
 if __name__ == "__main__":
     from main_panel import MainPanel
     app = MainPanel()

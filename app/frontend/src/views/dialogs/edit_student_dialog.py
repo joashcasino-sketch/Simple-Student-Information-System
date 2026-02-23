@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox, ttk
 
-class UpdateStudentDialog:
+class UpdateProgramDialog:
     def __init__(self, parent, controller, student_data):
         self.controller = controller
         self.result = None
