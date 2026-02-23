@@ -221,12 +221,12 @@ class CollegePanel(Frame):
     def delete_selected_college(self):
         selected = self.tree.selection()
         if not selected:
-            messagebox.showwarning("No Selection", "Please select a student to delete.")
+            messagebox.showwarning("No Selection", "Please select a college to delete.")
             return
         
         confirm = messagebox.askyesno(
             "Confirm Delete",
-            f"Delete {len(selected)} student(s)? This cannot be undone."
+            f"Delete {len(selected)} college(s)? This cannot be undone."
         )
 
         if not confirm:
@@ -239,7 +239,7 @@ class CollegePanel(Frame):
         selected = self.tree.selection()
 
         if not selected:
-            messagebox.showwarning("No Selection", "Please select a program to edit.")
+            messagebox.showwarning("No Selection", "Please select a college to edit.")
             return
 
         item = self.tree.item(selected[0])

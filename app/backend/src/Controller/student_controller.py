@@ -64,3 +64,10 @@ class StudentController:
         except Exception as e:
             print(f"Sort error: {e}")
         
+    def bulk_edit_students(self, student_ids, changes):
+        success_count = 0
+        for student_id in student_ids:
+            if self.model.bulk_edit_student(str(student_id), changes):
+                success_count += 1
+        messagebox.showinfo("Success", f"{success_count} student(s) updated.")
+        self.views.populate_students() 

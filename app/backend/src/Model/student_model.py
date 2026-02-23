@@ -122,3 +122,28 @@ class StudentModel:
         except Exception as e:
             print(f"Sort student error: {e}")
             return []
+        
+    def bulk_edit_student(self, student_id, changes):
+        try:
+            rows = []
+            found = False
+            with open(self.csv_file, 'r', newline='', encoding='utf-8') as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    if row['ID Number'] == student_id:
+                        row.update(changes)  
+                        found = True
+                    rows.append(row)
+
+            if not found:
+                return False
+
+            with open(self.csv_file, 'w', newline='', encoding='utf-8') as f:
+                writer = csv.DictWriter(f, fieldnames=self.headers)
+                writer.writeheader()
+                writer.writerows(rows)
+
+            return True
+        except Exception as e:
+            print(f"Bulk edit error: {e}")
+            return False

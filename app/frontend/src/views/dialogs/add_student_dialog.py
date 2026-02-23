@@ -110,7 +110,17 @@ class AddStudentDialog:
         tk.Label(form_frame, background="#F8ECD1", text="Year Level:", font=("Lato", 10)).grid(row=3, column=0, sticky="w", pady=10)
         self.year_var = tk.StringVar(value="1")
         year_dropdown = tk.OptionMenu(form_frame, self.year_var, "1", "2", "3", "4")
-        year_dropdown.config(width=27, bg="#DEB6AB")
+        year_dropdown.config(
+             width=35,
+            bg="#DEB6AB",
+            fg="black",
+            relief="flat",          
+            borderwidth=2,          
+            highlightthickness=2,  
+            activebackground="#C9A090",
+            cursor="hand2",
+            indicatoron=False
+        )
         year_dropdown.grid(row=3, column=1, pady=10)
 
         # College dropdown
@@ -119,14 +129,34 @@ class AddStudentDialog:
         self.college_var = tk.StringVar(value=college_options[0] if college_options else "")
         self.college_var.trace("w", self.on_college_select)
         college_menu = tk.OptionMenu(form_frame, self.college_var, *college_options if college_options else ["No colleges"])
-        college_menu.config(width=27, bg="#DEB6AB")
+        college_menu.config(
+            width=35,
+            bg="#DEB6AB",
+            fg="black",
+            relief="flat",          # ← removes the raised border
+            borderwidth=2,          # ← removes border width
+            highlightthickness=2,   # ← removes focus highlight ring
+            activebackground="#C9A090",
+            cursor="hand2",
+            indicatoron=False       # ← removes the arrow indicator on the right
+        )
         college_menu.grid(row=4, column=1, pady=10)
 
         # Program dropdown (populated after college is selected)
         tk.Label(form_frame, background="#F8ECD1", text="Program:", font=("Lato", 10)).grid(row=5, column=0, sticky="w", pady=10)
         self.program_var = tk.StringVar()
         self.program_menu = tk.OptionMenu(form_frame, self.program_var, "")
-        self.program_menu.config(width=27, bg="#DEB6AB")
+        self.program_menu.config(
+            width=35,
+            bg="#DEB6AB",
+            fg="black",
+            relief="flat",          
+            borderwidth=2,          
+            highlightthickness=2,  
+            activebackground="#C9A090",
+            cursor="hand2",
+            indicatoron=False
+        )
         self.program_menu.grid(row=5, column=1, pady=10)
 
         # Trigger initial program load

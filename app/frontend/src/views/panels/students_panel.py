@@ -239,6 +239,14 @@ class StudentPanel(Frame):
             messagebox.showwarning("No Selection", "Please select a student to edit.")
             return
 
+        if len(selected) > 1:
+            ids = [self.tree.item(item)['values'][0] for item in selected]
+            dialog_path = Path(__file__).resolve().parent.parent / "dialogs"
+            sys.path.insert(0, str(dialog_path))
+            from bulk_edit_student_dialog import BulkEditStudentDialog
+            BulkEditStudentDialog(self, self.student_controller, ids)
+            return
+
         item = self.tree.item(selected[0])
         values = item['values'] 
 
