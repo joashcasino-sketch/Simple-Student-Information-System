@@ -1,10 +1,8 @@
 from pathlib import Path
-from pydoc import text
 import sys
 import tkinter as tk
 import csv
 from tkinter import CENTER, Button, Canvas, Frame, PhotoImage, Label, StringVar, ttk, Entry, messagebox
-from tkinter import dialog
 
 BASE_DIR = Path(__file__).resolve().parent
 ASSETS_PATH = BASE_DIR.parent.parent.parent / "assets"
@@ -194,6 +192,8 @@ class StudentPanel(Frame):
         self.tree.heading('College', text='College')
 
         self.tree.bind('<Button-1>', lambda e: 'break' if self.tree.identify_region(e.x, e.y) == 'separator' else None)
+        self.tree.bind('<B1-Motion>', self.on_drag_select)
+        self.tree.bind('<ButtonRelease-1>', self.on_drag_release)
         self.tree.place(x=280.0, y=200.0, width=950, height=450.0)
 
         self.populate_students()
@@ -258,15 +258,31 @@ class StudentPanel(Frame):
 
     def delete_selected_student(self):
         selected = self.tree.selection()
-        
         if not selected:
             messagebox.showwarning("No Selection", "Please select a student to delete.")
             return
         
-        item = self.tree.item(selected[0])
-        student_id = item['values'][0]
+        confirm = messagebox.askyesno(
+            "Confirm Delete",
+            f"Delete {len(selected)} student(s)? This cannot be undone."
+        )
 
-        self.student_controller.delete_student(str(student_id))
+        if not confirm:
+            return
+        
+        ids = [self.tree.item(item)['values'][0] for item in selected]
+        self.student_controller.bulk_delete_students(ids)
+
+    def on_drag_select(self, event):
+        item = self.tree.identify_row(event.y)
+        if item:
+            current = list(self.tree.selection())
+            if item not in current:
+                current.append(item)
+            self.tree.selection_set(current)
+
+    def on_drag_release(self, event):
+        pass
 
     def setup_buttons(self, user_role):
         if user_role != 'admin':

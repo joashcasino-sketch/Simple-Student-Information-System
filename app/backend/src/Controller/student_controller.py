@@ -44,6 +44,12 @@ class StudentController:
         else:
             messagebox.showerror("Error", "Student not found.")
 
+    def bulk_delete_students(self, student_ids):
+        for student_id in student_ids:
+            self.model.delete_student(str(student_id))
+        messagebox.showinfo("Success", f"{len(student_ids)} student(s) deleted.")
+        self.views.populate_students()
+
     def search_student(self, query):
         try:
             results = self.model.search_student(query)
