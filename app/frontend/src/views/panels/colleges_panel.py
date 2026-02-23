@@ -112,6 +112,7 @@ class CollegePanel(Frame):
             borderwidth=0, highlightthickness=0,
             background="#85586F",
             foreground="white",
+            command=self.open_add_dialog,
             relief="flat", activebackground="#F8ECD1", cursor="hand2",
         )
 
@@ -194,6 +195,12 @@ class CollegePanel(Frame):
                     ), tags=(tag,))          
         except FileNotFoundError:
             print(f"CSV file not found at: {csv_path}")
+
+    def open_add_dialog(self):
+        dialog_path = Path(__file__).resolve().parent.parent / "dialogs"
+        sys.path.insert(0, str(dialog_path))
+        from add_college_dialog import AddCollegeDialog
+        AddCollegeDialog(self, self.college_controller)
 
 if __name__ == "__main__":
     from main_panel import MainPanel

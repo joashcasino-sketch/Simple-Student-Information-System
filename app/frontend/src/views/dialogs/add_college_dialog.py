@@ -2,7 +2,7 @@ from pathlib import Path
 import tkinter as tk
 from tkinter import messagebox
 
-class AddProgramDialog:
+class AddCollegeDialog:
     def __init__(self, parent, controller):
         self.controller = controller
         self.result = None
@@ -41,16 +41,6 @@ class AddProgramDialog:
         # Form frame
         form_frame = tk.Frame(self.dialog, padx=30, pady=20, bg="#F8ECD1")
         form_frame.pack(fill="both", expand=True)
-        
-        # Program Code
-        tk.Label(form_frame, background="#F8ECD1", text="Program Code:", font=("Lato", 10)).grid(row=0, column=0, sticky="w", pady=10)
-        self.program_code_entry = tk.Entry(form_frame, bg="#DEB6AB", font=("Lato", 10), width=30)
-        self.program_code_entry.grid(row=0, column=1, pady=10)
-        
-        # Program Name
-        tk.Label(form_frame, background="#F8ECD1", text="Program Name:", font=("Lato", 10)).grid(row=1, column=0, sticky="w", pady=10)
-        self.program_name_entry = tk.Entry(form_frame,bg="#DEB6AB", font=("Lato", 10), width=30)
-        self.program_name_entry.grid(row=1, column=1, pady=10)
         
         # College Code
         tk.Label(form_frame, background="#F8ECD1",  text="College Code:", font=("Lato", 10)).grid(row=4, column=0, sticky="w", pady=10)
@@ -94,18 +84,16 @@ class AddProgramDialog:
     
     def on_save(self):
         # Collect form data
-        program_data = {
-            'Program Code': self.program_code_entry.get().strip(),
-            'Program Name': self.program_name_entry.get().strip(),
+        college_data = {
             'College Code': self.college_code_entry.get().strip(),
             'College Name': self.college_name_entry.get().strip()
         }
         
         # Validate
-        if not program_data['Program Code'] or not program_data['Program Name']:
-            messagebox.showerror("Error", "ID Program Code and Program Name are required!")
+        if not college_data['College Code'] or not college_data['College Name']:
+            messagebox.showerror("Error", "ID College Code and  College Name are required!")
             return
         
         # Call controller
-        self.controller.add_program_from_dialog(program_data)
+        self.controller.add_college_from_dialog(college_data)
         self.dialog.destroy()
