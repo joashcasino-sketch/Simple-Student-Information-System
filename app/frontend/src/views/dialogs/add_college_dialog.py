@@ -8,7 +8,7 @@ class AddCollegeDialog:
         self.result = None
 
         self.dialog = tk.Toplevel(parent)
-        self.dialog.title("Add Program")
+        self.dialog.title("Add College")
         self.dialog.geometry("400x500")
         self.dialog.configure(background="#F8ECD1")
         self.dialog.resizable(False, False)
@@ -30,7 +30,7 @@ class AddCollegeDialog:
         # Title
         title = tk.Label(
             self.dialog,
-            text="Add New Student",
+            text="Add New College",
             font=("Lato", 16, "bold"),
             background="#85586F",
             foreground="white",

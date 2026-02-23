@@ -87,6 +87,26 @@ class CollegeModel:
         except Exception as e:
             print(f"Error deleting college {e}")
             return False
+        
+    def search_college(self, query):
+        try:
+            results = []
+            query = query.lower().strip()
+
+            with open(self.csv_file, 'r', newline='', encoding='utf-8') as file:
+                reader = csv.DictReader(file)
+                for row in reader:
+                    if any(query in str(value).lower() for value in row.values()):
+                        results.append(row)
+
+            return results
+        
+        except FileNotFoundError:
+            return []
+        
+        except Exception as e:
+            print(f"Search college error: {e}")
+            return []
     
     def college_has_programs(self, college_code):
         try:
@@ -99,3 +119,16 @@ class CollegeModel:
             return False
         except FileNotFoundError:
             return False
+        
+    def sort_college(self, column, reverse=False):
+        try:
+            with open(self.csv_file, 'r', newline='', encoding='utf-8') as file:
+                reader = csv.DictReader(file)
+                rows = list(reader)
+
+            rows.sort(key=lambda r: r.get(column, '').lower(), reverse=reverse)
+            return rows
+
+        except Exception as e:
+            print(f"Error sorting college: {e}")
+            return []

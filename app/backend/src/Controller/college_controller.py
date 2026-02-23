@@ -26,12 +26,12 @@ class CollegeController:
             messagebox.showerror("Error", "Program ID Already Exist!")
         return success
     
-    def update_program(self, college_data):
+    def update_college(self, college_data):
         success = self.model.edit_college(college_data)
 
         if success:
             messagebox.showinfo("Success", "Program has been updated!")
-            self.views.populate_colleges()
+            self.views.populate_college()
         else:
             messagebox.showerror("Error", "Please enter all required fields!")
         return success
@@ -51,6 +51,26 @@ class CollegeController:
             self.views.populate_colleges()
         else:
             messagebox.showerror("Error", "College not found.")
+
+    def bulk_delete_colleges(self, college_codes):
+        for college_code in college_codes:
+            self.model.delete_college(str(college_code))
+        messagebox.showinfo("Success", f"{len(college_codes)} college(s) deleted.")
+        self.views.populate_college()
+
+    def search_college(self, query):
+        try:
+            results = self.model.search_college(query)
+            self.views.populate_college(results)
+        except Exception as e:
+            print(f"Search error: {e}")
+
+    def sort_college(self, column, reverse=False):
+        try:
+            results = self.model.sort_college(column, reverse)
+            self.views.populate_college(results)
+        except Exception as e:
+            print(f"Sort error: {e}") 
 
     
         

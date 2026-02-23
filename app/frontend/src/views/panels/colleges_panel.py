@@ -3,6 +3,7 @@ from pathlib import Path
 import sys
 import tkinter as tk
 from tkinter import CENTER, Button, Canvas, Frame, PhotoImage, Label, ttk, Entry
+from tkinter import messagebox
 
 BASE_DIR = Path(__file__).resolve().parent
 ASSETS_PATH = BASE_DIR.parent.parent.parent / "assets"
@@ -10,9 +11,11 @@ CONTROLLER_PATH = BASE_DIR.parent.parent.parent.parent / 'backend' / 'src' / 'Co
 dialog_path = BASE_DIR.parent / 'dialogs'
 
 sys.path.insert(0, str(CONTROLLER_PATH))
-sys.path.insert(0, str(dialog_path))
-
 from college_controller import CollegeController
+
+sys.path.insert(0, str(dialog_path))
+from sort_dropdown import SortDropdown
+
 
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
@@ -80,29 +83,36 @@ class CollegePanel(Frame):
         )
 
         self.search_bar_image = PhotoImage(file=relative_to_assets("TextBox.png"))
-        self.search_bar = self.canvas.create_image(620.0, 125.0, image=self.search_bar_image)
+        self.search_bar = self.canvas.create_image(632.0, 125.0, image=self.search_bar_image)
         self.search_entry = Entry(
             self,
             bd=0, bg="#DEB6AB", fg="#000716",
             highlightthickness=0, font=("Inter", 11)
         )
+        self.search_entry.bind("<Return>", lambda e: self.on_search())
+
 
         self.search_button_image = PhotoImage(file=relative_to_assets("search_button.png"))
         self.search_button = Button(
             self,
             image=self.search_button_image,
             borderwidth=0, highlightthickness=0,
-            command=lambda: print("Clicked"),
+            command=self.on_search,
             relief="flat", activebackground="#F8ECD1", cursor="hand2",
         )
 
-        self.sort_button_image = PhotoImage(file=relative_to_assets("sort_button.png"))
-        self.sort_button = Button(
+        # self.sort_button_image = PhotoImage(file=relative_to_assets("sort_button.png"))
+        # self.sort_button = Button(
+        #     self,
+        #     image=self.sort_button_image,
+        #     borderwidth=0, highlightthickness=0,
+        #     command=lambda: print("Clicked"),
+        #     relief="flat", activebackground="#F8ECD1", cursor="hand2",
+        # )
+        self.sort_dropdown = SortDropdown(
             self,
-            image=self.sort_button_image,
-            borderwidth=0, highlightthickness=0,
-            command=lambda: print("Clicked"),
-            relief="flat", activebackground="#F8ECD1", cursor="hand2",
+            on_select_callback=self.college_controller.sort_college,
+            options=['College Code', 'College Name']
         )
 
         self.add_button = Button(
@@ -124,6 +134,7 @@ class CollegePanel(Frame):
             background="#85586F",
             foreground="white",
             relief="flat", activebackground="#F8ECD1", cursor="hand2",
+            command=self.open_edit_dialog
         )
         
         self.delete_button = Button(
@@ -134,6 +145,7 @@ class CollegePanel(Frame):
             background="#85586F",
             foreground="white",
             relief="flat", activebackground="#F8ECD1", cursor="hand2",
+            command=self.delete_selected_college
         )
 
         self.canvas.create_text(
@@ -146,12 +158,12 @@ class CollegePanel(Frame):
         self.program_button.place(x=15.0, y=160.0, width=216, height=31)
         self.college_button.place(x=24.0, y=210.0, width=215, height=31)
         self.setting_button.place(x=18.0, y=630.0, width=215, height=31)
-        self.search_entry.place(x=280.0, y=112.0, width=600, height=26.0)
-        self.search_button.place(x=980.0, y=108.0, width=52, height=35.0)
-        self.sort_button.place(x=1038.0, y=108.0, width=101, height=35.0)
-        self.add_button.place(x=450.0, y=165.0, width=90, height=30.0)
-        self.edit_button.place(x=550.0, y=165.0, width=90, height=30.0)
-        self.delete_button.place(x=650.0, y=165.0, width=100, height=30.0)
+        self.search_entry.place(x=290.0, y=113.0, width=590, height=26.0)
+        self.search_button.place(x=995.0, y=108.0, width=52, height=35.0)
+        self.sort_dropdown.place(x=1055.0, y=108.0, width=98, height=35.0)
+        self.add_button.place(x=915.0, y=165.0, width=90, height=30.0)
+        self.edit_button.place(x=1020.0, y=165.0, width=90, height=30.0)
+        self.delete_button.place(x=1125.0, y=165.0, width=100, height=30.0)
 
         self.canvas.pack(fill="x")
 
@@ -176,34 +188,103 @@ class CollegePanel(Frame):
         self.tree.place(x=280.0, y=200.0, width=950, height=450.0)
 
         self.populate_college()
+        self.setup_buttons(self.user_role)
 
-    def populate_college(self):
+    def populate_college(self, data=None):
         for row in self.tree.get_children():
             self.tree.delete(row)
 
         self.tree.tag_configure("odd", background="#DEB6AB", foreground="#000000")   # black
         self.tree.tag_configure("even", background="#AC7D88", foreground="#FFFFFF")  # white
         try:
-            csv_path = BASE_DIR.parent.parent.parent.parent / "backend" / "data" / "colleges.csv"
-            with open(csv_path, newline="", encoding="utf-8") as f:
-                reader = csv.DictReader(f)
-                for i, row in enumerate(reader):        # ← enumerate for index
-                    tag = "odd" if i % 2 == 0 else "even"
-                    self.tree.insert("", "end", text=str(i+1), values=(
-                        row["College Code"],
-                        row["College Name"],
-                    ), tags=(tag,))          
+            if data is None:
+                csv_path = BASE_DIR.parent.parent.parent.parent / "backend" / "data" / "colleges.csv"
+                with open(csv_path, newline="", encoding="utf-8") as file:
+                    reader = csv.DictReader(file)
+                    data = list(reader)
+
+            for i, row in enumerate(data):        # ← enumerate for index
+                tag = "odd" if i % 2 == 0 else "even"
+                self.tree.insert("", "end", text=str(i+1), values=(
+                    row["College Code"],
+                    row["College Name"],
+                ), tags=(tag,))          
         except FileNotFoundError:
             print(f"CSV file not found at: {csv_path}")
 
     def open_add_dialog(self):
         dialog_path = Path(__file__).resolve().parent.parent / "dialogs"
         sys.path.insert(0, str(dialog_path))
-        from add_college_dialog import AddCollegeDialog
+        from add_college_dialog import AddCollegeDialog # type: ignore
         AddCollegeDialog(self, self.college_controller)
 
+    def delete_selected_college(self):
+        selected = self.tree.selection()
+        if not selected:
+            messagebox.showwarning("No Selection", "Please select a student to delete.")
+            return
+        
+        confirm = messagebox.askyesno(
+            "Confirm Delete",
+            f"Delete {len(selected)} student(s)? This cannot be undone."
+        )
+
+        if not confirm:
+            return
+        
+        ids = [self.tree.item(item)['values'][0] for item in selected]
+        self.college_controller.bulk_delete_colleges(ids) 
+
+    def open_edit_dialog(self):
+        selected = self.tree.selection()
+
+        if not selected:
+            messagebox.showwarning("No Selection", "Please select a program to edit.")
+            return
+
+        item = self.tree.item(selected[0])
+        values = item['values'] 
+
+        college_data = {
+        'College Code': values[0],
+        'College Name': values[1],
+        }
+
+        dialog_path = Path(__file__).resolve().parent.parent / "dialogs"
+        sys.path.insert(0, str(dialog_path))
+        from edit_college_dialog import UpdateCollegeDialog
+        UpdateCollegeDialog(self, self.college_controller, college_data)
+
+    def setup_buttons(self, user_role):
+        if user_role != 'admin':
+            self.delete_button.config(state="disabled")
+            self.delete_button.configure(background="#A49A97")
+            self.edit_button.config(state="disabled")
+            self.edit_button.configure(background="#A49A97")
+        else:
+            self.delete_button.config(state="normal")
+            self.edit_button.config(state="normal")
+
+    def on_search(self):
+        query = self.search_entry.get().strip()
+        if query:
+            self.college_controller.search_college(query)
+        else:
+            self.populate_college()
+
+    def on_drag_select(self, event):
+        item = self.tree.identify_row(event.y)
+        if item:
+            current = list(self.tree.selection())
+            if item not in current:
+                current.append(item)
+            self.tree.selection_set(current)
+
+    def on_drag_release(self, event):
+        pass
+     
 if __name__ == "__main__":
     from main_panel import MainPanel
-    app = MainPanel()
+    app = MainPanel(user_role="admin")
     app.show_panel("college")
     app.run()

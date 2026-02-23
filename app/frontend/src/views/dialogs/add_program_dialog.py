@@ -30,7 +30,7 @@ class AddProgramDialog:
         # Title
         title = tk.Label(
             self.dialog,
-            text="Add New Student",
+            text="Add New Program",
             font=("Lato", 16, "bold"),
             background="#85586F",
             foreground="white",

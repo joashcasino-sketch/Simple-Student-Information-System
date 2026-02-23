@@ -26,6 +26,8 @@ class MainPanel:
 
         self.create_all_panels()
         self.show_panel("student")
+        
+        self.center_window()
 
     def create_all_panels(self):
         from students_panel import StudentPanel
@@ -44,6 +46,7 @@ class MainPanel:
             self.panels[name] = frame
             frame.place(x=0, y=0, relwidth=1, relheight=1)
 
+
     def show_panel(self, name):
         panel = self.panels[name]
         panel.lift()
@@ -52,6 +55,12 @@ class MainPanel:
 
     def run(self):
         self.root.mainloop()
+
+    def center_window(self):
+        self.root.update_idletasks()
+        x = (self.root.winfo_screenwidth() // 2) - (self.root.winfo_width() // 2)
+        y = (self.root.winfo_screenheight() // 2) - (self.root.winfo_height() // 2)
+        self.root.geometry(f'+{x}+{y}')
 
 if __name__ == "__main__":
     app = MainPanel(user_role="admin")

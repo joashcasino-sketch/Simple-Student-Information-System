@@ -11,9 +11,10 @@ CONTROLLER_PATH = BASE_DIR.parent.parent.parent.parent / 'backend' / 'src' / 'Co
 dialog_path = BASE_DIR.parent / 'dialogs'
 
 sys.path.insert(0, str(CONTROLLER_PATH))
-sys.path.insert(0, str(dialog_path))
-
 from program_controller import ProgramController
+
+sys.path.insert(0, str(dialog_path))
+from sort_dropdown import SortDropdown
 
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
@@ -81,29 +82,27 @@ class ProgramPanel(Frame):
         )
 
         self.search_bar_image = PhotoImage(file=relative_to_assets("TextBox.png"))
-        self.search_bar = self.canvas.create_image(620.0, 125.0, image=self.search_bar_image)
+        self.search_bar = self.canvas.create_image(632.0, 125.0, image=self.search_bar_image)
         self.search_entry = Entry(
             self,
             bd=0, bg="#DEB6AB", fg="#000716",
             highlightthickness=0, font=("Inter", 11)
         )
+        self.search_entry.bind("<Return>", lambda e: self.on_search())
 
         self.search_button_image = PhotoImage(file=relative_to_assets("search_button.png"))
         self.search_button = Button(
             self,
             image=self.search_button_image,
             borderwidth=0, highlightthickness=0,
-            command=lambda: print("Clicked"),
+            command=self.on_search,
             relief="flat", activebackground="#F8ECD1", cursor="hand2",
         )
 
-        self.sort_button_image = PhotoImage(file=relative_to_assets("sort_button.png"))
-        self.sort_button = Button(
+        self.sort_dropdown = SortDropdown(
             self,
-            image=self.sort_button_image,
-            borderwidth=0, highlightthickness=0,
-            command=lambda: print("Clicked"),
-            relief="flat", activebackground="#F8ECD1", cursor="hand2",
+            on_select_callback=self.program_controller.sort_program,
+            options=['Program Code', 'Program Name', 'College Code', 'College Name']
         )
 
         self.add_button = Button(
@@ -136,8 +135,9 @@ class ProgramPanel(Frame):
             background="#85586F",
             foreground="white",
             relief="flat", activebackground="#F8ECD1", cursor="hand2",
+            command=self.delete_selected_program
         )
-
+        
         self.canvas.create_text(
             405, 175,
             text="Program",
@@ -145,15 +145,14 @@ class ProgramPanel(Frame):
             fill="#642D48", anchor="e")
 
         self.student_button.place(x=18.0, y=110.0, width=213.0, height=31)
-        self.program_button.place(x=20.0, y=160.0, width=216, height=31)
+        self.program_button.place(x=21.0, y=160.0, width=216, height=31)
         self.college_button.place(x=16.0, y=210.0, width=215, height=31)
         self.setting_button.place(x=18.0, y=630.0, width=215, height=31)
-        self.search_entry.place(x=280.0, y=112.0, width=600, height=26.0)
-        self.search_button.place(x=980.0, y=108.0, width=52, height=35.0)
-        self.sort_button.place(x=1038.0, y=108.0, width=101, height=35.0)
-        self.add_button.place(x=450.0, y=165.0, width=90, height=30.0)
-        self.edit_button.place(x=550.0, y=165.0, width=90, height=30.0)
-        self.delete_button.place(x=650.0, y=165.0, width=100, height=30.0)
+        self.search_button.place(x=995.0, y=108.0, width=52, height=35.0)
+        self.sort_dropdown.place(x=1055.0, y=108.0, width=98, height=35.0)
+        self.add_button.place(x=915.0, y=165.0, width=90, height=30.0)
+        self.edit_button.place(x=1020.0, y=165.0, width=90, height=30.0)
+        self.delete_button.place(x=1125.0, y=165.0, width=100, height=30.0)
 
         self.canvas.pack(fill="x")
 
@@ -182,6 +181,7 @@ class ProgramPanel(Frame):
         self.tree.place(x=280.0, y=200.0, width=950, height=450.0)
 
         self.populate_programs()
+        self.setup_buttons(self.user_role)
     
     def populate_programs(self, data=None):
         for row in self.tree.get_children():
@@ -190,17 +190,21 @@ class ProgramPanel(Frame):
         self.tree.tag_configure("odd", background="#DEB6AB", foreground="#000000")   # black
         self.tree.tag_configure("even", background="#AC7D88", foreground="#FFFFFF")  # white
         try:
-            csv_path = BASE_DIR.parent.parent.parent.parent / "backend" / "data" / "programs.csv"
-            with open(csv_path, newline="", encoding="utf-8") as f:
-                reader = csv.DictReader(f)
-                for i, row in enumerate(reader):        # ← enumerate for index
-                    tag = "odd" if i % 2 == 0 else "even"
-                    self.tree.insert("", "end", text=str(i+1), values=(
-                        row["Program Code"],
-                        row["Program Name"],
-                        row["College Code"],
-                        row["College Name"],
-                    ), tags=(tag,))          
+            if data is None:
+                csv_path = BASE_DIR.parent.parent.parent.parent / "backend" / "data" / "programs.csv"
+                with open(csv_path, newline="", encoding="utf-8") as file:
+                    reader = csv.DictReader(file)
+                    data = list(reader)
+
+            for i, row in enumerate(data):        # ← enumerate for index
+                tag = "odd" if i % 2 == 0 else "even"
+                self.tree.insert("", "end", text=str(i+1), values=(
+                    row["Program Code"],
+                    row["Program Name"],
+                    row["College Code"],
+                    row["College Name"],
+                ), tags=(tag,))      
+
         except FileNotFoundError:
             print(f"CSV file not found at: {csv_path}")
 
@@ -231,8 +235,55 @@ class ProgramPanel(Frame):
         sys.path.insert(0, str(dialog_path))
         from edit_program_dialog import UpdateProgramDialog
         UpdateProgramDialog(self, self.program_controller, program_data)
+    
+    def delete_selected_program(self):
+        selected = self.tree.selection()
+        if not selected:
+            messagebox.showwarning("No Selection", "Please select a program to delete.")
+            return
+        
+        confirm = messagebox.askyesno(
+            "Confirm Delete",
+            f"Delete {len(selected)} program(s)? This cannot be undone."
+        )
+
+        if not confirm:
+            return
+        
+        ids = [self.tree.item(item)['values'][0] for item in selected]
+        self.program_controller.bulk_delete_programs(ids) 
+
+    def setup_buttons(self, user_role):
+        if user_role != 'admin':
+            self.delete_button.config(state="disabled")
+            self.delete_button.configure(background="#A49A97")
+            self.edit_button.config(state="disabled")
+            self.edit_button.configure(background="#A49A97")
+        else:
+            self.delete_button.config(state="normal")
+            self.edit_button.config(state="normal")
+
+    def on_search(self):
+        query = self.search_entry.get().strip()
+        if query:
+            self.program_controller.search_program(query)
+        else:
+            self.populate_programs()
+
+    def on_drag_select(self, event):
+        item = self.tree.identify_row(event.y)
+        if item:
+            current = list(self.tree.selection())
+            if item not in current:
+                current.append(item)
+            self.tree.selection_set(current)
+
+    def on_drag_release(self, event):
+        pass
+
+
 if __name__ == "__main__":
     from main_panel import MainPanel
-    app = MainPanel()
+    app = MainPanel(user_role="admin")
     app.show_panel("program")
     app.run()

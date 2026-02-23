@@ -52,5 +52,25 @@ class ProgramController:
         else:
             messagebox.showerror("Error", "program not found.")
 
+    def bulk_delete_programs(self, program_codes):
+        for program_code in program_codes:
+            self.model.delete_program(str(program_code))
+        messagebox.showinfo("Success", f"{len(program_codes)} program(s) deleted.")
+        self.views.populate_programs()
+
+    def search_program(self, query):
+        try:
+            results = self.model.search_program(query)
+            self.views.populate_programs(results)
+        except Exception as e:
+            print(f"Search error: {e}")
+
+    def sort_program(self, column, reverse=False):
+        try:
+            results = self.model.sort_program(column, reverse)
+            self.views.populate_programs(results)
+        except Exception as e:
+            print(f"Sort error: {e}")
+
     
         

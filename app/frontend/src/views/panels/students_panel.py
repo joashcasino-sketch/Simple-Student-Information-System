@@ -81,7 +81,7 @@ class StudentPanel(Frame):
         )
 
         self.search_bar_image = PhotoImage(file=relative_to_assets("TextBox.png"))
-        self.search_bar = self.canvas.create_image(620.0, 125.0, image=self.search_bar_image)
+        self.search_bar = self.canvas.create_image(632.0, 125.0, image=self.search_bar_image)
         self.search_entry = Entry(
             self,
             bd=0, bg="#DEB6AB", fg="#000716",
@@ -156,12 +156,12 @@ class StudentPanel(Frame):
         self.program_button.place(x=15.0, y=160.0, width=216, height=31)
         self.college_button.place(x=16.0, y=210.0, width=215, height=31)
         self.setting_button.place(x=18.0, y=630.0, width=215, height=31)
-        self.search_entry.place(x=280.0, y=112.0, width=600, height=26.0)
-        self.search_button.place(x=980.0, y=108.0, width=52, height=35.0)
-        self.sort_dropdown.place(x=1038.0, y=108.0, width=98, height=35.0)
-        self.add_button.place(x=450.0, y=165.0, width=90, height=30.0)
-        self.edit_button.place(x=550.0, y=165.0, width=90, height=30.0)
-        self.delete_button.place(x=650.0, y=165.0, width=100, height=30.0)
+        self.search_entry.place(x=290.0, y=113.0, width=590, height=26.0)
+        self.search_button.place(x=995.0, y=108.0, width=52, height=35.0)
+        self.sort_dropdown.place(x=1055.0, y=108.0, width=98, height=35.0)
+        self.add_button.place(x=915.0, y=165.0, width=90, height=30.0)
+        self.edit_button.place(x=1020.0, y=165.0, width=90, height=30.0)
+        self.delete_button.place(x=1125.0, y=165.0, width=100, height=30.0)
 
 
         self.canvas.pack(fill="x")
