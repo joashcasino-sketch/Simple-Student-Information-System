@@ -92,10 +92,10 @@ class ProgramModel:
     def program_has_students(self, program_code):
         try:
             student_csv = self.csv_file.parent / 'students.csv'
-            with open(student_csv, 'r', encoding='utf-8') as file:
+            with open(student_csv, 'r', encoding='utf-8-sig') as file:
                 reader = csv.DictReader(file)
                 for row in reader:
-                    if row["Program"] == program_code:
+                    if row["Program"] == program_code.strip():
                         return True    
             return False
         except FileNotFoundError:

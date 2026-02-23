@@ -53,9 +53,27 @@ class ProgramController:
             messagebox.showerror("Error", "program not found.")
 
     def bulk_delete_programs(self, program_codes):
-        for program_code in program_codes:
-            self.model.delete_program(str(program_code))
-        messagebox.showinfo("Success", f"{len(program_codes)} program(s) deleted.")
+        blocked = []
+        deleted = []
+
+        for code in program_codes:
+            if self.model.program_has_students(str(code)):
+                blocked.append(str(code))
+            else:
+                success = self.model.delete_program(str(code))
+                if success:
+                    deleted.append(str(code))
+
+        if deleted:
+            messagebox.showinfo("Success", f"{len(deleted)} program(s) deleted.")
+
+        if blocked:
+            messagebox.showwarning(
+                "Cannot Delete",
+                f"The following program(s) still have enrolled students:\n"
+                f"{', '.join(blocked)}\nDelete or reassign their students first."
+            )
+
         self.views.populate_programs()
 
     def search_program(self, query):

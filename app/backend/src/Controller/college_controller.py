@@ -48,14 +48,32 @@ class CollegeController:
         success = self.model.delete_college(college_code)
         if success:
             messagebox.showinfo("Success", "College deleted successfully")
-            self.views.populate_colleges()
+            self.views.populate_college()
         else:
             messagebox.showerror("Error", "College not found.")
 
     def bulk_delete_colleges(self, college_codes):
-        for college_code in college_codes:
-            self.model.delete_college(str(college_code))
-        messagebox.showinfo("Success", f"{len(college_codes)} college(s) deleted.")
+        blocked = []
+        deleted = []
+
+        for code in college_codes:
+            if self.model.college_has_programs(str(code)):
+                blocked.append(str(code))
+            else:
+                success = self.model.delete_college(str(code))
+                if success:
+                    deleted.append(str(code))
+
+        if deleted:
+            messagebox.showinfo("Success", f"{len(deleted)} college(s) deleted.")
+
+        if blocked:
+            messagebox.showwarning(
+                "Cannot Delete",
+                f"The following college(s) still have programs:\n"
+                f"{', '.join(blocked)}\nDelete or reassign their programs first."
+            )
+
         self.views.populate_college()
 
     def search_college(self, query):
