@@ -6,14 +6,23 @@ from tkinter import CENTER, Button, Canvas, Frame, PhotoImage, Label, ttk, Entry
 
 BASE_DIR = Path(__file__).resolve().parent
 ASSETS_PATH = BASE_DIR.parent.parent.parent / "assets"
+CONTROLLER_PATH = BASE_DIR.parent.parent.parent.parent / 'backend' / 'src' / 'Controller'
+dialog_path = BASE_DIR.parent / 'dialogs'
+
+sys.path.insert(0, str(CONTROLLER_PATH))
+sys.path.insert(0, str(dialog_path))
+
+from program_controller import ProgramController
 
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
 
 class ProgramPanel(Frame): 
-    def __init__(self, parent, controller):
+    def __init__(self, parent, controller, user_role="user"):
         super().__init__(parent, bg="#F8ECD1") 
         self.controller = controller 
+        self.user_role = user_role
+        self.program_controller = ProgramController(self, user_role) 
         self.setup_ui()
 
     def setup_ui(self):
@@ -103,6 +112,7 @@ class ProgramPanel(Frame):
             borderwidth=0, highlightthickness=0,
             background="#85586F",
             foreground="white",
+            command=self.open_add_dialog,
             relief="flat", activebackground="#F8ECD1", cursor="hand2",
         )
 
@@ -191,6 +201,12 @@ class ProgramPanel(Frame):
                     ), tags=(tag,))          
         except FileNotFoundError:
             print(f"CSV file not found at: {csv_path}")
+
+    def open_add_dialog(self):
+        dialog_path = Path(__file__).resolve().parent.parent / "dialogs"
+        sys.path.insert(0, str(dialog_path))
+        from add_program_dialog import AddProgramDialog
+        AddProgramDialog(self, self.program_controller)
 
 if __name__ == "__main__":
     from main_panel import MainPanel

@@ -10,7 +10,7 @@ sys.path.insert(0, str(program_model_path))
 
 from program_model import ProgramModel
 
-class ProgmamController:
+class ProgramController:
     def __init__(self, views, user_role):
         self.model = ProgramModel()
         self.views = views

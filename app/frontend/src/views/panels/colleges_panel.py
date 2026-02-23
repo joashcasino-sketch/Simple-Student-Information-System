@@ -6,14 +6,23 @@ from tkinter import CENTER, Button, Canvas, Frame, PhotoImage, Label, ttk, Entry
 
 BASE_DIR = Path(__file__).resolve().parent
 ASSETS_PATH = BASE_DIR.parent.parent.parent / "assets"
+CONTROLLER_PATH = BASE_DIR.parent.parent.parent.parent / 'backend' / 'src' / 'Controller'
+dialog_path = BASE_DIR.parent / 'dialogs'
+
+sys.path.insert(0, str(CONTROLLER_PATH))
+sys.path.insert(0, str(dialog_path))
+
+from college_controller import CollegeController
 
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
 
 class CollegePanel(Frame): 
-    def __init__(self, parent, controller):
+    def __init__(self, parent, controller, user_role="user"):
         super().__init__(parent, bg="#F8ECD1") 
-        self.controller = controller 
+        self.controller = controller
+        self.user_role = user_role
+        self.college_controller = CollegeController(self, user_role) 
         self.setup_ui()
 
     def setup_ui(self):

@@ -2,8 +2,6 @@ import sys
 from pathlib import Path
 import tkinter as tk
 
-from students_panel import StudentPanel
-
 BASE_DIR = Path(__file__).resolve().parent
 ASSETS_PATH = BASE_DIR.parent.parent.parent / "assets"
 CONTROLLER_PATH = BASE_DIR.parent.parent.parent.parent / 'backend' / 'src' / 'Controller'
@@ -13,7 +11,7 @@ def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
 
 class MainPanel:
-    def __init__(self, user_role):
+    def __init__(self, user_role="user"):
         self.user_role = user_role
         self.root = tk.Tk()
         self.root.geometry("1260x680")
@@ -33,21 +31,16 @@ class MainPanel:
         from students_panel import StudentPanel
         from programs_panel import ProgramPanel
         from colleges_panel import CollegePanel
-        from student_controller import StudentController
-        from program_controller import ProgramController
-        from college_controller import CollegeController
 
         panels_config = [
-        (StudentPanel, None, "student", {"user_role": self.user_role}),  # ← None, handled internally
-        (ProgramPanel, ProgramController, "program", {}),
-        (CollegePanel, CollegeController, "college", {})
+        (StudentPanel, "student"),  # ← None, handled internally
+        (ProgramPanel, "program"),
+        (CollegePanel, "college")
         ]
 
 
-        for PanelClass, ControllerClass, name, kwargs in panels_config:
-            frame = PanelClass(self.container, self, **kwargs)
-            if ControllerClass:
-                ControllerClass(views=frame)
+        for PanelClass, name, in panels_config:
+            frame = PanelClass(self.container, self, user_role=self.user_role)
             self.panels[name] = frame
             frame.place(x=0, y=0, relwidth=1, relheight=1)
 

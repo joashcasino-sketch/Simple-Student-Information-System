@@ -129,7 +129,14 @@ def create_login_window():
     window.image_refs = [image_image_1, entry_image_1, entry_image_2, button_image_1, button_image_2, icon]
     
     window.resizable(False, False)
+    _center_window(window)
     return window
+
+def _center_window(window):
+        window.update_idletasks()
+        x = (window.winfo_screenwidth() // 2) - (window.winfo_width() // 2)
+        y = (window.winfo_screenheight() // 2) - (window.winfo_height() // 2)
+        window.geometry(f'+{x}+{y}')
 
 
 if __name__ == "__main__":
