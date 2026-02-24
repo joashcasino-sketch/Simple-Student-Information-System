@@ -31,6 +31,12 @@ class SortDropdown:
     def place(self, **kwargs):
         self.button.place(**kwargs)
 
+    def grid(self, **kwargs):
+        self.button.grid(**kwargs)
+
+    def pack(self, **kwargs):
+        self.button.pack(**kwargs)
+
     def toggle(self):
         if self.dropdown_open and self.dropdown_win:
             self.close()

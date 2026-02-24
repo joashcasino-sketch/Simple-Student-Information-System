@@ -1,8 +1,9 @@
 from pathlib import Path
 import sys
-import tkinter as tk
 import csv
-from tkinter import CENTER, Button, Canvas, Frame, PhotoImage, Label, StringVar, ttk, Entry, messagebox
+from tkinter import CENTER, Button, Frame, PhotoImage, Label, StringVar, ttk, Entry, messagebox
+import tkinter as tk
+from turtle import width
 
 BASE_DIR = Path(__file__).resolve().parent
 ASSETS_PATH = BASE_DIR.parent.parent.parent / "assets"
@@ -18,249 +19,308 @@ from student_controller import StudentController
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
 
-class StudentPanel(Frame): 
+
+class StudentPanel(Frame):
     def __init__(self, parent, controller, user_role="user"):
-        super().__init__(parent, bg="#F8ECD1") 
+        super().__init__(parent, bg="#F8ECD1")
         self.controller = controller
         self.user_role = user_role
         self.student_controller = StudentController(self, user_role)
+
+        # Allow this frame itself to scale
+        self.rowconfigure(0, weight=0)   # header bar
+        self.rowconfigure(1, weight=1)   # main body
+        self.columnconfigure(0, weight=0)  # sidebar
+        self.columnconfigure(1, weight=1)  # content
+
         self.setup_ui()
 
+    # ─────────────────────────── UI SETUP ────────────────────────────────────
+
     def setup_ui(self):
-        self.canvas = Canvas(
-            self,                        # ← self, not self.window
-            width=1260, 
-            height=680,
-            bg="#F8ECD1",
-            bd=0,
-            highlightthickness=0
-        )
+        self._build_header()
+        self._build_sidebar()
+        self._build_content()
+        self.setup_buttons(self.user_role)
+        self.populate_students()
 
-        self.canvas.create_rectangle(0, 0, 1260, 85, fill="#85586F", outline="")
-        self.canvas.create_rectangle(0, 85, 250, 680, fill="#DEB6AB", outline="")
-        self.canvas.create_text(380, 120, text="Student Records", font=("Arial", 16), fill="Black")
+    # ── Header bar (spans full width) ────────────────────────────────────────
 
-        self.logo = PhotoImage(file=relative_to_assets("logo_wow.png"))
-        self.logo_image = Label(self, image=self.logo, bg="#85586F")
-        self.logo_image.place(x=10.0, y=20.0, width=200.0, height=60)
+    def _build_header(self):
+        self.header = Frame(self, bg="#85586F", height=85)
+        self.header.grid(row=0, column=0, columnspan=2, sticky="ew")
+        self.header.grid_propagate(False)          # keep fixed height
+        self.header.columnconfigure(0, weight=1)   # logo stretches left
 
-        self.student_button_image = PhotoImage(file=relative_to_assets("student_button.png"))
-        self.student_button = Button(
-            self,
-            image=self.student_button_image,
-            borderwidth=0, highlightthickness=0,
-            command=lambda: self.controller.show_panel("student"),  # ← controller
-            relief="flat", activebackground="#DEB6AB", cursor="hand2",
-        )
+        try:
+            self.logo = PhotoImage(file=relative_to_assets("deb_logo.png"))
+            logo_label = Label(self.header, image=self.logo, bg="#85586F")
+            logo_label.place(x=10, y=20, width=200, height=60)
+        except Exception:
+            Label(self.header, text="DeB", bg="#85586F",
+                  fg="white", font=("Arial", 20, "bold")).place(x=10, y=20)
 
-        self.program_button_image = PhotoImage(file=relative_to_assets("program_button.png"))
-        self.program_button = Button(
-            self,
-            image=self.program_button_image,
-            borderwidth=0, highlightthickness=0,
-            command=lambda: self.controller.show_panel("program"),  # ← controller
-            relief="flat", activebackground="#DEB6AB", cursor="hand2",
-        )
+    # ── Sidebar (fixed width, scales vertically) ──────────────────────────────
 
-        self.college_button_image = PhotoImage(file=relative_to_assets("college_button.png"))
-        self.college_button = Button(
-            self,
-            image=self.college_button_image,
-            borderwidth=0, highlightthickness=0,
-            command=lambda: self.controller.show_panel("college"),  # ← controller
-            relief="flat", activebackground="#DEB6AB", cursor="hand2",
-        )
+    def _build_sidebar(self):
+        self.sidebar = Frame(self, bg="#DEB6AB", width=250)
+        self.sidebar.grid(row=1, column=0, sticky="ns")
+        self.sidebar.grid_propagate(False)
+        self.sidebar.rowconfigure(10, weight=1)    # push settings to bottom
 
-        self.setting_button_image = PhotoImage(file=relative_to_assets("settings_button.png"))
-        self.setting_button = Button(
-            self,
-            image=self.setting_button_image,
-            borderwidth=0, highlightthickness=0,
-            command=lambda: print("Clicked"),
-            relief="flat", activebackground="#DEB6AB", cursor="hand2",
-        )
+        nav_buttons = [
+            ("student_button.png",  "Student",  "student"),
+            ("program_button.png",  "Program",  "program"),
+            ("college_button.png",  "College",  "college"),
+        ]
 
-        self.search_bar_image = PhotoImage(file=relative_to_assets("TextBox.png"))
-        self.search_bar = self.canvas.create_image(632.0, 125.0, image=self.search_bar_image)
+        for i, (img_file, label, panel_name) in enumerate(nav_buttons):
+            try:
+                img = PhotoImage(file=relative_to_assets(img_file))
+                btn = Button(
+                    self.sidebar,
+                    image=img,
+                    borderwidth=0, highlightthickness=0,
+                    bg="#DEB6AB",
+                    command=lambda p=panel_name: self.controller.show_panel(p),
+                    relief="flat", activebackground="#DEB6AB", cursor="hand2",
+                )
+                btn.image = img
+                btn.image.configure(width=215)          # prevent GC
+                btn.grid(row=i, column=0, padx=15,
+                         pady=(10 if i == 0 else 15, 0), sticky="ew")
+            except Exception:
+                # Fallback text button if image missing
+                Button(
+                    self.sidebar, text=label,
+                    font=("Lato", 11, "bold"), bg="#85586F", fg="white",
+                    relief="flat", cursor="hand2",
+                    command=lambda p=panel_name: self.controller.show_panel(p),
+                ).grid(row=i, column=0, padx=15, pady=(10 if i == 0 else 5, 0),
+                       sticky="ew")
+
+        # Settings at the very bottom
+        try:
+            self.setting_img = PhotoImage(file=relative_to_assets("settings_button.png"))
+            settings_btn = Button(
+                self.sidebar,
+                image=self.setting_img,
+                borderwidth=0, highlightthickness=0,
+                command=lambda: print("Settings clicked"),
+                relief="flat", activebackground="#DEB6AB", cursor="hand2",
+            )
+            settings_btn.grid(row=11, column=0, padx=15, pady=10, sticky="sew")
+        except Exception:
+            Button(
+                self.sidebar, text="Settings",
+                font=("Lato", 11, "bold"), bg="#85586F", fg="white",
+                relief="flat", cursor="hand2",
+            ).grid(row=11, column=0, padx=15, pady=10, sticky="sew")
+
+    # ── Main content area (scales both ways) ──────────────────────────────────
+
+    def _build_content(self):
+        self.content = Frame(self, bg="#F8ECD1")
+        self.content.grid(row=1, column=1, sticky="nsew")
+
+        # Row 0 → toolbar (search / sort)
+        # Row 1 → action bar (title / buttons)
+        # Row 2 → table  ← this row expands
+        self.content.rowconfigure(0, weight=0)
+        self.content.rowconfigure(1, weight=0)
+        self.content.rowconfigure(2, weight=1)
+        self.content.columnconfigure(0, weight=1)
+
+        self._build_toolbar()
+        self._build_action_bar()
+        self._build_table()
+
+    def _build_toolbar(self):
+        """Search bar + sort dropdown row."""
+        toolbar = Frame(self.content, bg="#F8ECD1", height=55)
+        toolbar.grid(row=0, column=0, sticky="ew", padx=20, pady=(10, 0))
+        toolbar.grid_propagate(False)
+        toolbar.columnconfigure(0, weight=1)   # search entry stretches
+
         self.search_entry = Entry(
-            self,
+            toolbar,
             bd=0, bg="#DEB6AB", fg="#000716",
-            highlightthickness=0, font=("Inter", 11)
+            highlightthickness=1, highlightbackground="#85586F",
+            font=("Lato", 11), relief="flat"
         )
+        self.search_entry.grid(row=0, column=0, sticky="ew",
+                               ipady=6, padx=(0, 6), pady=10)
         self.search_entry.bind("<Return>", lambda e: self.on_search())
 
-        self.search_button_image = PhotoImage(file=relative_to_assets("search_button.png"))
-        self.search_button = Button(
-            self,
-            image=self.search_button_image,
-            borderwidth=0, highlightthickness=0,
-            command=self.on_search,
-            relief="flat", activebackground="#F8ECD1", cursor="hand2",
-        )
-
-        # self.sort_button_image = PhotoImage(file=relative_to_assets("sort_button.png"))
-        # self.sort_button = Button(
-        #     self,
-        #     image=self.sort_button_image,
-        #     borderwidth=0, highlightthickness=0,
-        #     command=lambda: print("Clicked"),
-        #     relief="flat", activebackground="#F8ECD1", cursor="hand2",
-        # )
+        try:
+            self.search_img = PhotoImage(file=relative_to_assets("search_button.png"))
+            search_btn = Button(
+                toolbar, image=self.search_img,
+                borderwidth=0, highlightthickness=0,
+                command=self.on_search,
+                relief="flat", activebackground="#F8ECD1", cursor="hand2",
+            )
+        except Exception:
+            search_btn = Button(
+                toolbar, text="🔍", font=("Lato", 11),
+                bg="#85586F", fg="white", relief="flat",
+                cursor="hand2", command=self.on_search,
+            )
+        search_btn.grid(row=0, column=1, padx=(0, 6), pady=10)
 
         self.sort_dropdown = SortDropdown(
-            self,
+            toolbar,
             on_select_callback=self.student_controller.sort_student
         )
+        self.sort_dropdown.grid(row=0, column=2, pady=10)
 
-        self.add_button = Button(
-            self,
-            text="Add Student",
+    def _build_action_bar(self):
+        """Title label + CRUD buttons row."""
+        action_bar = Frame(self.content, bg="#F8ECD1")
+        action_bar.grid(row=1, column=0, sticky="ew", padx=20, pady=(0, 6))
+        action_bar.columnconfigure(0, weight=1)   # title stretches left
+
+        Label(
+            action_bar, text="Student",
+            font=("Lato", 24), fg="#642D48", bg="#F8ECD1"
+        ).grid(row=0, column=0, sticky="w")
+
+        btn_frame = Frame(action_bar, bg="#F8ECD1")
+        btn_frame.grid(row=0, column=1, sticky="e")
+
+        btn_cfg = dict(
             font=("Lato", 10, "bold"),
             borderwidth=0, highlightthickness=0,
-            background="#85586F",
-            foreground="white",
-            command=self.open_add_dialog,
-            relief="flat", activebackground="#F8ECD1", cursor="hand2",
+            background="#85586F", foreground="white",
+            relief="flat", activebackground="#6e3d54",
+            cursor="hand2", padx=12, pady=6,
         )
 
-        self.edit_button = Button(
-            self,
-            text="Edit Student",
-            font=("Lato", 10, "bold"),
-            borderwidth=0, highlightthickness=0,
-            background="#85586F",
-            foreground="white",
-            relief="flat", activebackground="#F8ECD1", cursor="hand2",
-            command=self.open_edit_dialog
-        )
-        
-        self.delete_button = Button(
-            self,
-            text="Delete Student",
-            font=("Lato", 10, "bold"),
-            borderwidth=0, highlightthickness=0,
-            background="#85586F",
-            foreground="white",
-            relief="flat", activebackground="#F8ECD1", cursor="hand2",
-            command=self.delete_selected_student
-        )
+        self.add_button = Button(btn_frame, text="Add Student",
+                                 command=self.open_add_dialog, **btn_cfg)
+        self.add_button.pack(side="left", padx=(0, 8))
 
-        self.canvas.create_text(
-            392, 175,
-            text="Student",
-            font=("Lato", 24),
-            fill="#642D48",
-            anchor="e")
+        self.edit_button = Button(btn_frame, text="Edit Student",
+                                  command=self.open_edit_dialog, **btn_cfg)
+        self.edit_button.pack(side="left", padx=(0, 8))
 
-        self.student_button.place(x=25.0, y=110.0, width=213.0, height=31)
-        self.program_button.place(x=15.0, y=160.0, width=216, height=31)
-        self.college_button.place(x=16.0, y=210.0, width=215, height=31)
-        self.setting_button.place(x=18.0, y=630.0, width=215, height=31)
-        self.search_entry.place(x=290.0, y=113.0, width=590, height=26.0)
-        self.search_button.place(x=995.0, y=108.0, width=52, height=35.0)
-        self.sort_dropdown.place(x=1055.0, y=108.0, width=98, height=35.0)
-        self.add_button.place(x=915.0, y=165.0, width=90, height=30.0)
-        self.edit_button.place(x=1020.0, y=165.0, width=90, height=30.0)
-        self.delete_button.place(x=1125.0, y=165.0, width=100, height=30.0)
+        self.delete_button = Button(btn_frame, text="Delete Student",
+                                    command=self.delete_selected_student, **btn_cfg)
+        self.delete_button.pack(side="left")
 
+    def _build_table(self):
+        """Treeview + scrollbars that fill remaining space."""
+        table_frame = Frame(self.content, bg="#F8ECD1")
+        table_frame.grid(row=2, column=0, sticky="nsew", padx=20, pady=(0, 20))
+        table_frame.rowconfigure(0, weight=1)
+        table_frame.columnconfigure(0, weight=1)
 
-        self.canvas.pack(fill="x")
-
+        # ── Style ──────────────────────────────────────────────────────────
         self.style = ttk.Style()
         self.style.theme_use("clam")
-        self.style.configure("Treeview", bg="#A6738D", fg="#A6738D", fieldbackground="#D8A9C2")
-        self.style.configure("Treeview.Heading", background="#884668", foreground="#D8A9C2", font=('Trebuchet MS', 10, 'bold'))
+        self.style.configure("Treeview",
+                             bg="#A6738D", fg="#000000",
+                             fieldbackground="#D8A9C2", rowheight=26)
+        self.style.configure("Treeview.Heading",
+                             background="#884668", foreground="#D8A9C2",
+                             font=("Trebuchet MS", 10, "bold"))
+        self.style.map("Treeview", background=[("selected", "#85586F")])
 
-        self.tree = ttk.Treeview(self,
-            columns=('ID Number', 'Name', 'Gender', 'Year Level', 'Program', 'College'),
-            show='tree headings')
+        # ── Treeview ───────────────────────────────────────────────────────
+        self.tree = ttk.Treeview(
+            table_frame,
+            columns=("ID Number", "Name", "Gender", "Year Level", "Program", "College"),
+            show="tree headings",
+        )
+        self.tree.grid(row=0, column=0, sticky="nsew")
 
-        self.tree.column("#0", width=40, minwidth=40, stretch=False)
-        self.tree.column("ID Number", width=100, minwidth=100, stretch=False)
-        self.tree.column("Name", width=200, minwidth=200, stretch=False)
-        self.tree.column("Gender", width=105, minwidth=105, stretch=False)
-        self.tree.column("Year Level", width=100, minwidth=100, stretch=False)
-        self.tree.column("Program", width=200, minwidth=200, stretch=False)
-        self.tree.column("College", width=200, minwidth=200, stretch=False)
+        # Row-number column — narrow, fixed
+        self.tree.column("#0",        width=40,  minwidth=40,  stretch=False)
+        # Data columns — give Name/Program/College stretch room
+        self.tree.column("ID Number", width=110, minwidth=90,  stretch=False)
+        self.tree.column("Name",      width=200, minwidth=140, stretch=True)
+        self.tree.column("Gender",    width=90,  minwidth=70,  stretch=False)
+        self.tree.column("Year Level",width=90,  minwidth=70,  stretch=False)
+        self.tree.column("Program",   width=160, minwidth=100, stretch=True)
+        self.tree.column("College",   width=160, minwidth=100, stretch=True)
 
+        for col in ("ID Number", "Name", "Gender", "Year Level", "Program", "College"):
+            self.tree.heading(col, text=col, anchor=CENTER)
         self.tree.heading("#0", text="", anchor="w")
-        self.tree.heading('ID Number', text='ID Number', anchor=CENTER)
-        self.tree.heading('Name', text='Name')
-        self.tree.heading('Gender', text='Gender')
-        self.tree.heading('Year Level', text='Year Level')
-        self.tree.heading('Program', text='Program')
-        self.tree.heading('College', text='College')
 
-        self.tree.bind('<Button-1>', lambda e: 'break' if self.tree.identify_region(e.x, e.y) == 'separator' else None)
-        self.tree.bind('<B1-Motion>', self.on_drag_select)
-        self.tree.bind('<ButtonRelease-1>', self.on_drag_release)
-        self.tree.place(x=280.0, y=200.0, width=950, height=450.0)
+        # ── Scrollbars ─────────────────────────────────────────────────────
+        # vsb = ttk.Scrollbar(table_frame, orient="vertical",
+        #                     command=self.tree.yview)
+        # vsb.grid(row=0, column=1, sticky="ns")
+        # self.tree.configure(yscrollcommand=vsb.set)
 
-        self.populate_students()
-        self.setup_buttons(self.user_role)
-    
+        # hsb = ttk.Scrollbar(table_frame, orient="horizontal",
+        #                     command=self.tree.xview)
+        # hsb.grid(row=1, column=0, sticky="ew")
+        # self.tree.configure(xscrollcommand=hsb.set)
+
+        # ── Bindings ───────────────────────────────────────────────────────
+        self.tree.bind("<Escape>", self.deselect_all)
+        self.tree.bind("<Button-1>", self.on_click)
+            # lambda e: "break"
+            # if self.tree.identify_region(e.x, e.y) == "separator" else None)
+        self.tree.bind("<B1-Motion>", self.on_drag_select)
+        self.tree.bind("<ButtonRelease-1>", self.on_drag_release)
+
+    # ─────────────────────────── DATA ────────────────────────────────────────
+
     def populate_students(self, data=None):
         for row in self.tree.get_children():
             self.tree.delete(row)
 
-        self.tree.tag_configure("odd", background="#DEB6AB", foreground="#000000")  
-        self.tree.tag_configure("even", background="#AC7D88", foreground="#FFFFFF") 
+        self.tree.tag_configure("odd",  background="#DEB6AB", foreground="#000000")
+        self.tree.tag_configure("even", background="#AC7D88", foreground="#FFFFFF")
 
         try:
             if data is None:
-                csv_path = BASE_DIR.parent.parent.parent.parent / "backend" / "data" / "students.csv"
+                csv_path = (BASE_DIR.parent.parent.parent.parent
+                            / "backend" / "data" / "students.csv")
                 with open(csv_path, newline="", encoding="utf-8") as f:
-                    reader = csv.DictReader(f)
-                    data = list(reader)
+                    data = list(csv.DictReader(f))
 
-            for i, row in enumerate(data):       
+            for i, row in enumerate(data):
                 tag = "odd" if i % 2 == 0 else "even"
-                self.tree.insert("", "end", text=str(i+1), values=(
-                    row["ID Number"],
-                    row["Name"],
-                    row["Gender"],
-                    row["Year Level"],
-                    row["Program"],
-                    row["College"]
-                ), tags=(tag,))          
+                self.tree.insert("", "end", text=str(i + 1), values=(
+                    row["ID Number"], row["Name"], row["Gender"],
+                    row["Year Level"], row["Program"], row["College"],
+                ), tags=(tag,))
         except FileNotFoundError:
-            print(f"CSV file not found at: {csv_path}")
+            print("CSV file not found.")
+
+    # ─────────────────────────── DIALOGS ─────────────────────────────────────
 
     def open_add_dialog(self):
-        dialog_path = Path(__file__).resolve().parent.parent / "dialogs"
-        sys.path.insert(0, str(dialog_path))
+        dlg = Path(__file__).resolve().parent.parent / "dialogs"
+        sys.path.insert(0, str(dlg))
         from add_student_dialog import AddStudentDialog
         AddStudentDialog(self, self.student_controller)
 
     def open_edit_dialog(self):
         selected = self.tree.selection()
-
         if not selected:
             messagebox.showwarning("No Selection", "Please select a student to edit.")
             return
 
+        dlg = Path(__file__).resolve().parent.parent / "dialogs"
+        sys.path.insert(0, str(dlg))
+
         if len(selected) > 1:
-            ids = [self.tree.item(item)['values'][0] for item in selected]
-            dialog_path = Path(__file__).resolve().parent.parent / "dialogs"
-            sys.path.insert(0, str(dialog_path))
+            ids = [self.tree.item(i)["values"][0] for i in selected]
             from bulk_edit_student_dialog import BulkEditStudentDialog
             BulkEditStudentDialog(self, self.student_controller, ids)
             return
 
-        item = self.tree.item(selected[0])
-        values = item['values'] 
-
+        values = self.tree.item(selected[0])["values"]
         student_data = {
-        'ID Number': str(values[0]),
-        'Name': values[1],
-        'Gender': values[2],
-        'Year Level': str(values[3]),
-        'Program': values[4],
-        'College': values[5]
+            "ID Number": str(values[0]), "Name": values[1],
+            "Gender": values[2], "Year Level": str(values[3]),
+            "Program": values[4], "College": values[5],
         }
-
-        dialog_path = Path(__file__).resolve().parent.parent / "dialogs"
-        sys.path.insert(0, str(dialog_path))
         from edit_student_dialog import UpdateStudentDialog
         UpdateStudentDialog(self, self.student_controller, student_data)
 
@@ -269,17 +329,12 @@ class StudentPanel(Frame):
         if not selected:
             messagebox.showwarning("No Selection", "Please select a student to delete.")
             return
-        
-        confirm = messagebox.askyesno(
-            "Confirm Delete",
-            f"Delete {len(selected)} student(s)? This cannot be undone."
-        )
+        if messagebox.askyesno("Confirm Delete",
+                               f"Delete {len(selected)} student(s)? This cannot be undone."):
+            ids = [self.tree.item(i)["values"][0] for i in selected]
+            self.student_controller.bulk_delete_students(ids)
 
-        if not confirm:
-            return
-        
-        ids = [self.tree.item(item)['values'][0] for item in selected]
-        self.student_controller.bulk_delete_students(ids)
+    # ─────────────────────────── HELPERS ─────────────────────────────────────
 
     def on_drag_select(self, event):
         item = self.tree.identify_row(event.y)
@@ -293,14 +348,13 @@ class StudentPanel(Frame):
         pass
 
     def setup_buttons(self, user_role):
-        if user_role != 'admin':
-            self.delete_button.config(state="disabled")
-            self.delete_button.configure(background="#A49A97")
-            self.edit_button.config(state="disabled")
-            self.edit_button.configure(background="#A49A97")
+        disabled_color = "#A49A97"
+        if user_role != "admin":
+            for btn in (self.delete_button, self.edit_button):
+                btn.config(state="disabled", background=disabled_color)
         else:
-            self.delete_button.config(state="normal")
-            self.edit_button.config(state="normal")
+            for btn in (self.delete_button, self.edit_button):
+                btn.config(state="normal")
 
     def on_search(self):
         query = self.search_entry.get().strip()
@@ -309,10 +363,21 @@ class StudentPanel(Frame):
         else:
             self.populate_students()
 
+    def on_click(self, event):
+        if self.tree.identify_region(event.x, event.y) == "separator":
+            return "break"
+        
+        item = self.tree.identify_row(event.y)
+        if not item:
+            self.deselect_all()
+            return "break"
+        
+    def deselect_all(self, event=None):
+        self.tree.selection_set([])
+
+
 if __name__ == "__main__":
     from main_panel import MainPanel
     app = MainPanel(user_role="admin")
     app.show_panel("student")
     app.run()
-
-    

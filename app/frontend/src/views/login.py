@@ -9,7 +9,7 @@ from login_handler import handle_sign_in, handle_sign_up
 
 BASE_DIR = Path(__file__).resolve().parent
 ASSETS_PATH = BASE_DIR.parent.parent.parent / "frontend" / "assets" / "frame0"
-LOGO_PATH = Path(__file__).resolve().parent.parent.parent / "assets" / "logo.png"
+LOGO_PATH = Path(__file__).resolve().parent.parent.parent / "assets" / "deb_logo.png"
 
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)

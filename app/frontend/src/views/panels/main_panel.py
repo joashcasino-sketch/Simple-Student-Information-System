@@ -15,7 +15,8 @@ class MainPanel:
         self.user_role = user_role
         self.root = tk.Tk()
         self.root.geometry("1260x680")
-        self.root.resizable(False, False)
+        self.root.minsize(1260, 680)
+        self.root.resizable(True, True)
         self.root.title("Student Information System")
         self.root.configure(bg="#F8ECD1")
         self.current_panel = None
